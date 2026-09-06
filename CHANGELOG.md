@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Trucks in traffic, puddles that splash, rare repair pickups.
+- Gamepad support, leaderboard export/import, off-road rumble and guardrail clang.
+- Headless smoke test and GitHub Actions workflow.
+
 ## 0.2.0 — Realistic highway
 
 - Perspective-mapped asphalt, gravel shoulders and grass; painted lines; guardrails.
