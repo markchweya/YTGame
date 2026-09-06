@@ -184,6 +184,7 @@
   const settings = Object.assign({}, CONFIG.SETTINGS, Storage.get('settings', {}));
   const applySettings = () => {
     game.renderer.quality = settings.quality;
+    document.body.dataset.quality = settings.quality;
     game.shakeEnabled = settings.shake;
     game.difficulty = settings.difficulty;
     audio.setVolume(settings.volume);
