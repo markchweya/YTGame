@@ -1,6 +1,8 @@
 /* DOM layer: screens, HUD, toasts, start lights, leaderboard tables, results. */
 const UI = {
-  screens: ['menu', 'howto', 'leaderboard', 'pause', 'results', 'hud'],
+  screens: ['menu', 'howto', 'leaderboard', 'settings', 'pause', 'results', 'hud'],
+  _fpsAcc: 0,
+  _fpsN: 0,
   el: {},
   _speedoLen: 0,
   _lastPos: null,
@@ -12,7 +14,7 @@ const UI = {
       'hud-speed', 'speedo-fill', 'speedo-needle', 'speedo-ticks', 'hud-gear', 'hud-nitro', 'hud-coins', 'hud-shield', 'hud-combo',
       'race-progress', 'race-progress-wrap', 'best-race', 'best-endless', 'lb-body', 'lb-empty',
       'results-kicker', 'results-position', 'results-title', 'results-rank', 'results-standings',
-      'res-score', 'res-distance', 'res-time', 'res-topspeed', 'res-coins', 'res-overtakes', 'touch-controls',
+      'res-score', 'res-distance', 'res-time', 'res-topspeed', 'res-coins', 'res-overtakes', 'touch-controls', 'settings', 'hud-fps',
     ];
     ids.forEach((id) => (this.el[id] = document.getElementById(id)));
     const path = this.el['speedo-fill'];
@@ -156,6 +158,22 @@ const UI = {
 
   updateShield(on) {
     this.el['hud-shield'].classList.toggle('hidden', !on);
+  },
+
+  /* Rolling FPS readout (updated twice a second); pass dt every frame. */
+  tickFps(dt) {
+    const el = this.el['hud-fps'];
+    if (!el || el.classList.contains('hidden')) return;
+    this._fpsAcc += dt;
+    this._fpsN++;
+    if (this._fpsAcc >= 0.5) {
+      el.textContent = `${Math.round(this._fpsN / this._fpsAcc)} FPS`;
+      this._fpsAcc = 0;
+      this._fpsN = 0;
+    }
+  },
+  showFps(on) {
+    this.el['hud-fps'].classList.toggle('hidden', !on);
   },
 
   /* Surface colour cue: tints the speed readout while off the asphalt. */
