@@ -1,0 +1,14 @@
+{
+  "name": "neon-rush",
+  "version": "0.2.0",
+  "description": "Arcade highway racer with AI rivals, obstacles and a leaderboard. Zero build step.",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node tests/smoke.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  },
+  "license": "MIT"
+}
