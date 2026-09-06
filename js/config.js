@@ -56,6 +56,12 @@ const CONFIG = {
     hyper: { name: 'Phantom X', width: 1.04, height: 0.9, roof: 0.56, spoiler: 'lip', lights: 'bar', exhaust: 'center', speed: 1.02, handling: 1.1, nitro: 1.15, blurb: 'Razor handling, bigger nitro' },
   },
 
+  OBSTACLES: {
+    puddleSpeedMult: 0.9,   // speed kept after hitting a puddle
+    truckChance: 0.25,      // share of traffic spawns that are trucks
+    truckSpeedRange: [0.42, 0.55], // fraction of the player's cruise speed
+  },
+
   DIFFICULTY: {
     rampPerKm: 7,
     spawnGapStart: 62,
