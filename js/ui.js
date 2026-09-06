@@ -227,6 +227,11 @@ const UI = {
 
   toast(text, cls = '') {
     const box = this.el.toasts;
+    // drop an identical toast fired within the last second (e.g. bouncing along the shoulder)
+    const now = performance.now();
+    if (this._lastToast === text && now - this._lastToastAt < 1000) return;
+    this._lastToast = text;
+    this._lastToastAt = now;
     const t = document.createElement('div');
     t.className = `toast ${cls}`;
     t.textContent = text;
