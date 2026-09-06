@@ -66,6 +66,8 @@ function serve() {
   }
   const result = await page.evaluate(() => window.NeonRush.game.result);
   await page.waitForSelector('#results:not(.hidden)', { timeout: 5000 });
+  const board = await page.evaluate(() => window.NeonRush.Leaderboard.list('race'));
+  if (!board.length || board[0].name !== 'Bot') { console.error('Run was not recorded on the leaderboard', board); process.exit(1); }
 
   // endless mode: run for a few seconds, then quit to the garage
   await page.click('#btn-results-menu');
