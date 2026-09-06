@@ -146,6 +146,13 @@
   };
   requestAnimationFrame(drawShowcase);
 
+  /* ---- gamepad hints ---- */
+  window.addEventListener('gamepadconnected', (e) => {
+    const name = (e.gamepad.id || 'Controller').split('(')[0].trim();
+    UI.toast(`${name} connected`, 'info');
+  });
+  window.addEventListener('gamepaddisconnected', () => UI.toast('Controller disconnected', 'warn'));
+
   /* ---- audio unlock ---- */
   input.onAny = () => {
     audio.unlock();
