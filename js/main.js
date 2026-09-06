@@ -185,13 +185,19 @@
   const applySettings = () => {
     game.renderer.quality = settings.quality;
     game.shakeEnabled = settings.shake;
+    game.difficulty = settings.difficulty;
+    audio.setVolume(settings.volume);
     UI.showFps(settings.fps);
     $('set-quality').value = settings.quality;
+    $('set-difficulty').value = settings.difficulty;
+    $('set-volume').value = settings.volume;
     $('set-fps').checked = settings.fps;
     $('set-shake').checked = settings.shake;
     $('set-sound').checked = !audio.muted;
     Storage.set('settings', settings);
   };
+  $('set-difficulty').addEventListener('change', (e) => { settings.difficulty = e.target.value; applySettings(); });
+  $('set-volume').addEventListener('input', (e) => { settings.volume = parseFloat(e.target.value); audio.unlock(); applySettings(); audio.click(); });
   $('set-quality').addEventListener('change', (e) => { settings.quality = e.target.value; applySettings(); });
   $('set-fps').addEventListener('change', (e) => { settings.fps = e.target.checked; applySettings(); });
   $('set-shake').addEventListener('change', (e) => { settings.shake = e.target.checked; applySettings(); });
@@ -284,12 +290,14 @@
   /* ---- results ---- */
   game.onFinished = async (res) => {
     let rankInfo = null;
+    let prevBest = null;
     try {
+      prevBest = await Leaderboard.best(res.mode);
       rankInfo = await Leaderboard.submit(res);
     } catch (err) {
       console.warn('Leaderboard submit failed', err);
     }
-    setTimeout(() => UI.showResults(game, res, rankInfo), 900);
+    setTimeout(() => UI.showResults(game, res, rankInfo, prevBest), 900);
   };
   $('btn-retry').addEventListener('click', () => game.restart());
   $('btn-results-menu').addEventListener('click', () => {
