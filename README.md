@@ -24,7 +24,12 @@ Open http://localhost:8080.
 | Pause | `P` / `Esc` |
 | Mute | `M` |
 
-Touch devices get on-screen steer, brake and nitro buttons.
+Touch devices get on-screen steer, brake and nitro buttons. Gamepads work too:
+left stick or d-pad steers, `A` / right trigger is nitro, `B` / left trigger brakes,
+`Start` pauses.
+
+Settings (from the garage) cover graphics quality for older devices, an FPS counter,
+screen shake and sound.
 
 ## What's in the game
 
