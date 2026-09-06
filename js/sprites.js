@@ -19,6 +19,92 @@ const Sprites = {
     return c;
   },
 
+  TRUCK_W: 256,
+  TRUCK_H: 380,
+  TRUCK_GROUND: 362,
+
+  /* Rear view of a box truck: tall cargo body, roll-up door, twin rear wheels. */
+  truck(color) {
+    const key = `truck:${color}`;
+    if (this._cache.has(key)) return this._cache.get(key);
+    const c = document.createElement('canvas');
+    c.width = this.TRUCK_W;
+    c.height = this.TRUCK_H;
+    const ctx = c.getContext('2d');
+    const cx = this.TRUCK_W / 2;
+    const G = this.TRUCK_GROUND;
+    const w = 220;
+    const half = w / 2;
+    const boxTop = G - 330;
+    const boxBot = G - 70;
+    // shadow
+    let g = ctx.createRadialGradient(cx, G - 6, 10, cx, G - 6, half * 1.2);
+    g.addColorStop(0, 'rgba(0,0,0,0.55)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, G - 40, this.TRUCK_W, 60);
+    // wheels (dual rear)
+    ctx.fillStyle = '#0a0a0f';
+    for (const side of [-1, 1]) {
+      for (let i = 0; i < 2; i++) {
+        const x = cx + side * (half - 28 - i * 30) - 14;
+        rrect(ctx, x, G - 70, 28, 70, 8);
+        ctx.fill();
+      }
+    }
+    // chassis / bumper
+    ctx.fillStyle = '#23262e';
+    rrect(ctx, cx - half + 6, boxBot - 6, w - 12, 44, 6);
+    ctx.fill();
+    ctx.fillStyle = '#3a3e48';
+    ctx.fillRect(cx - half + 10, boxBot + 22, w - 20, 10);
+    // cargo box
+    g = ctx.createLinearGradient(cx - half, 0, cx + half, 0);
+    g.addColorStop(0, U.shade(color, -50));
+    g.addColorStop(0.2, color);
+    g.addColorStop(0.5, U.shade(color, 25));
+    g.addColorStop(0.8, color);
+    g.addColorStop(1, U.shade(color, -50));
+    ctx.fillStyle = g;
+    rrect(ctx, cx - half, boxTop, w, boxBot - boxTop, 8);
+    ctx.fill();
+    // roll-up door ribs
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    for (let y = boxTop + 26; y < boxBot - 20; y += 18) ctx.fillRect(cx - half + 22, y, w - 44, 4);
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(cx - half + 18, boxTop + 18, w - 36, boxBot - boxTop - 40);
+    // roof edge + marker lights
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fillRect(cx - half, boxTop, w, 8);
+    ctx.fillStyle = '#ff8a3d';
+    for (const x of [-half + 16, -16, 12, half - 20]) ctx.fillRect(cx + x, boxTop + 10, 8, 5);
+    // tail lights
+    for (const side of [-1, 1]) {
+      const lx = cx + side * (half - 34);
+      ctx.fillStyle = 'rgba(255,40,70,0.35)';
+      rrect(ctx, lx - 22, boxBot + 2, 44, 26, 6);
+      ctx.fill();
+      ctx.fillStyle = '#ff1f3d';
+      rrect(ctx, lx - 16, boxBot + 6, 32, 10, 3);
+      ctx.fill();
+      ctx.fillStyle = '#ffb347';
+      rrect(ctx, lx - 16, boxBot + 18, 32, 6, 2);
+      ctx.fill();
+    }
+    // plate
+    rrect(ctx, cx - 28, boxBot + 8, 56, 18, 3);
+    ctx.fillStyle = '#e9ecf5';
+    ctx.fill();
+    ctx.fillStyle = '#1a1d2e';
+    ctx.font = '700 11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('HAUL', cx, boxBot + 17);
+    this._cache.set(key, c);
+    return c;
+  },
+
   glow(color, size = 96) {
     const key = `glow:${color}:${size}`;
     if (this._cache.has(key)) return this._cache.get(key);
