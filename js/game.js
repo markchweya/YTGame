@@ -29,6 +29,8 @@ class Game {
     this.obstacles = [];
     this.pickups = [];
     this.particles = [];
+    this.skids = [];
+    this._skidAcc = 0;
     this.curve = 0;
     this.curveTarget = 0;
     this.curveTimer = 3;
@@ -278,6 +280,21 @@ class Game {
     }
     p.railCooldown = Math.max(0, (p.railCooldown || 0) - dt);
     p.tilt = U.damp(p.tilt, p.vx * 0.045 + (p.slide > 0 ? Math.sin(this.time * 18) * 0.06 : 0) + (p.offroad ? Math.sin(this.time * 31) * 0.012 : 0), 8, dt);
+
+    // skid marks: sliding on oil, or braking hard at speed, lays rubber on the asphalt
+    const SK = CONFIG.SKIDS;
+    const skidding = !p.offroad && (p.slide > 0 || (this.input.brake && p.speed > 30));
+    if (skidding) {
+      this._skidAcc += p.speed * dt;
+      if (this._skidAcc >= SK.segment) {
+        this._skidAcc = 0;
+        this.skids.push(new Skid(p.d - SK.segment, p.x, SK.segment, p.slide > 0 ? SK.alpha : SK.alpha * 0.6));
+        if (this.skids.length > SK.maxCount) this.skids.shift();
+        if (!p._screechWas) this.audio.screech();
+      }
+    } else this._skidAcc = 0;
+    p._screechWas = skidding;
+    if (this.skids.length && this.skids[0].d < p.d - 60) this.skids.shift();
 
     p.invuln = Math.max(0, p.invuln - dt);
     p.d += p.speed * dt;
