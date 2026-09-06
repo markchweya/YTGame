@@ -465,6 +465,12 @@ class Game {
     const p = this.player;
     const P = CONFIG.PLAYER;
     o.hit = true;
+    if (o.type === 'puddle') {
+      p.speed *= CONFIG.OBSTACLES.puddleSpeedMult;
+      for (let i = 0; i < 14; i++) this.spawnDust('rgba(150,180,220,0.7)', true);
+      this.audio.slide();
+      return;
+    }
     if (o.type === 'oil') {
       p.slide = P.oilSlideTime;
       p.slideDir = Math.random() < 0.5 ? -1 : 1;
