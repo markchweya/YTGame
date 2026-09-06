@@ -265,6 +265,8 @@ kbd { display: inline-block; min-width: 24px; text-align: center; padding: 3px 6
 .standing em { font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums; font-family: var(--label); font-weight: 700; font-size: 12px; }
 .standing.me { background: linear-gradient(90deg, rgba(255, 138, 31, 0.28), rgba(255, 138, 31, 0.08)); border-color: rgba(255, 138, 31, 0.5); }
 .standing.me b, .standing.me em { color: var(--amber-2); }
+.standing.flash { animation: standing-flash 0.6s ease; }
+@keyframes standing-flash { 30% { background: rgba(255, 196, 102, 0.55); transform: translateX(4px); } }
 
 .hud-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
 .speedo-cluster { position: relative; width: 236px; height: 150px; padding: 4px; background: transparent; border: 0; clip-path: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
