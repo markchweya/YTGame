@@ -50,8 +50,8 @@
         </div>
 
         <div class="cluster time-cluster">
-          <div class="time-row"><span class="hud-label">TIME</span><span class="hud-num" id="hud-time">0:00.0</span></div>
-          <div class="health" id="hud-lives" aria-label="Lives"></div>
+          <div class="time-row"><span class="hud-label" id="hud-time-label">TIME</span><span class="hud-num" id="hud-time">0:00.0</span></div>
+          <div class="crash-row"><span class="hud-label">CRASHES</span><b id="hud-crashes">0</b></div>
           <div class="shield-tag hidden" id="hud-shield">SHIELD ACTIVE</div>
         </div>
       </div>
@@ -125,7 +125,7 @@
             <button class="mode-card" data-mode="endless">
               <span class="mode-icon">∞</span>
               <span class="mode-name">Endless</span>
-              <span class="mode-desc">Survive, score, climb</span>
+              <span class="mode-desc">2-minute time attack</span>
               <span class="mode-best" id="best-endless">Best —</span>
             </button>
           </div>
@@ -170,7 +170,7 @@
           <li><span><kbd>P</kbd> / <kbd>Esc</kbd> · <kbd>M</kbd> · <kbd>R</kbd></span><em>Pause · mute · restart (from pause or results).</em></li>
         </ul>
         <div class="legend">
-          <div><i class="dot cone"></i>Cones, barriers, rocks and traffic cost a life</div>
+          <div><i class="dot cone"></i>Cones, barriers, rocks and traffic cost speed and points</div>
           <div><i class="dot oil"></i>Oil makes you slide</div>
           <div><i class="dot rail"></i>Guardrail bounces you back and kills speed</div>
           <div><i class="dot coin"></i>Coins chain into combos</div>
@@ -279,6 +279,7 @@
           <div class="stat"><span>Top speed</span><b id="res-topspeed">0 km/h</b></div>
           <div class="stat"><span>Coins</span><b id="res-coins">0</b></div>
           <div class="stat"><span>Overtakes</span><b id="res-overtakes">0</b></div>
+          <div class="stat"><span>Crashes</span><b id="res-crashes">0</b></div>
         </div>
         <div class="results-rank" id="results-rank"></div>
         <div class="sectors hidden" id="results-sectors"></div>
