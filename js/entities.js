@@ -28,6 +28,10 @@ class Player {
     this.length = P.carLength;
     this.topSpeed = 0;
     this.finished = false;
+    this.sector = 0;      // sectors completed (race mode)
+    this.sectorTimes = [];
+    this.railCooldown = 0;
+    this.lowNitroWarned = false;
   }
 }
 
