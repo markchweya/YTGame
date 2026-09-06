@@ -38,6 +38,15 @@ const U = {
     return `rgba(${r},${g},${b},${a})`;
   },
   laneX: (lane, lanes) => ((lane + 0.5) / lanes) * 2 - 1,
+  // deterministic pseudo-random in [0,1) for a numeric key — used for world props
+  hash(k) {
+    const x = Math.sin(k * 12.9898 + 78.233) * 43758.5453;
+    return x - Math.floor(x);
+  },
+  smoothstep(a, b, t) {
+    const x = U.clamp((t - a) / (b - a), 0, 1);
+    return x * x * (3 - 2 * x);
+  },
   escapeHTML: (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])),
   isTouch: () => window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window,
 };
