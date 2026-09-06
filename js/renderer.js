@@ -441,8 +441,7 @@ class Renderer {
 
   /* ---------- roadside props (deterministic from distance) ---------- */
   static hash(k) {
-    const x = Math.sin(k * 12.9898 + 78.233) * 43758.5453;
-    return x - Math.floor(x);
+    return U.hash(k);
   }
   lampPositions(game) {
     const out = [];
