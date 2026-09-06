@@ -1,10 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — Traffic, settings and splits
 
 - Trucks in traffic, puddles that splash, rare repair pickups.
 - Gamepad support, leaderboard export/import, off-road rumble and guardrail clang.
-- Headless smoke test and GitHub Actions workflow.
+- Settings panel: difficulty presets, volume, graphics quality, FPS counter, screen shake.
+- Sector split banners and sector times on results; personal-best delta.
+- Rival personalities, brake lights and stripe liveries; wind noise; camera pitch.
+- Offline-capable PWA shell; headless smoke test and GitHub Actions workflow.
 
 ## 0.2.0 — Realistic highway
 
