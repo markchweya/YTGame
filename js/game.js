@@ -274,6 +274,20 @@ class Game {
     p.d += p.speed * dt;
     this.score += CONFIG.SCORE.perMetre * p.speed * dt;
 
+    // sector splits (race mode)
+    if (this.mode === 'race') {
+      const sectorLen = CONFIG.RACE.sectorLength;
+      const sectors = Math.floor(p.d / sectorLen);
+      if (sectors > p.sector && sectors * sectorLen < CONFIG.RACE.length) {
+        p.sector = sectors;
+        const prev = p.sectorTimes.reduce((a, b) => a + b, 0);
+        const split = this.elapsed - prev;
+        p.sectorTimes.push(split);
+        this.ui.banner(`SECTOR ${sectors}`, `${U.fmtTime(split)} · P${this.position}`);
+        this.audio.sector();
+      }
+    }
+
     if (this.comboTimer > 0) {
       this.comboTimer -= dt;
       if (this.comboTimer <= 0) {
