@@ -137,6 +137,17 @@ class AudioEngine {
   bump() {
     this._noise({ dur: 0.2, vol: 0.25, cutoff: 600 });
   }
+  /* metallic clang for the guardrail */
+  rail() {
+    this._noise({ dur: 0.25, vol: 0.35, cutoff: 2400 });
+    this._blip({ type: 'square', from: 1400, to: 300, dur: 0.18, vol: 0.12 });
+    this._blip({ type: 'triangle', from: 2200, to: 900, dur: 0.3, vol: 0.08, delay: 0.03 });
+  }
+  /* soft double beep when nitro is nearly empty */
+  lowNitro() {
+    this._blip({ type: 'sine', from: 660, to: 660, dur: 0.07, vol: 0.08 });
+    this._blip({ type: 'sine', from: 660, to: 660, dur: 0.07, vol: 0.08, delay: 0.12 });
+  }
   slide() {
     this._noise({ dur: 0.6, vol: 0.2, cutoff: 2500 });
   }
