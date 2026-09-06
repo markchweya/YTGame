@@ -186,9 +186,6 @@ class AudioEngine {
   pickup() {
     this._blip({ type: 'triangle', from: 300, to: 900, dur: 0.25, vol: 0.2 });
   }
-  repair() {
-    [523, 659, 784].forEach((f, i) => this._blip({ type: 'triangle', from: f, to: f * 1.01, dur: 0.18, vol: 0.16, delay: i * 0.08 }));
-  }
   shield() {
     this._blip({ type: 'sine', from: 500, to: 1000, dur: 0.3, vol: 0.2 });
     this._blip({ type: 'sine', from: 750, to: 1500, dur: 0.3, vol: 0.15, delay: 0.1 });
