@@ -203,6 +203,9 @@ kbd { display: inline-block; min-width: 24px; text-align: center; padding: 3px 6
 .lb-table td:nth-child(3) { font-family: var(--display); font-size: 15px; font-weight: 700; color: var(--amber-2); font-variant-numeric: tabular-nums; }
 .lb-table td:last-child { color: var(--muted); font-size: 12px; }
 .lb-empty { padding: 28px; text-align: center; color: var(--muted); }
+.lb-table .diff { display: inline-block; margin-left: 6px; padding: 1px 6px; font-family: var(--label); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; font-style: normal; clip-path: var(--chamfer-sm); }
+.lb-table .diff.hard { background: rgba(255, 77, 94, 0.2); color: var(--bad); }
+.lb-table .diff.easy { background: rgba(255, 255, 255, 0.08); color: var(--muted); }
 .lb-tools { display: flex; gap: 18px; justify-content: center; margin-top: 14px; }
 
 /* full-width centre banner for milestones (sector times, records) */
