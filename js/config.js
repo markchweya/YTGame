@@ -116,6 +116,8 @@ const CONFIG = {
     edge: 'rgba(250,250,245,0.95)',
   },
 
+  BIRDS: { count: 7, speed: 0.012, height: 0.42 },
+
   SETTINGS: {
     quality: 'high',
     fps: false,
