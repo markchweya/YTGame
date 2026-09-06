@@ -42,6 +42,8 @@ class Rival {
     this.name = name;
     this.color = color;
     this.style = U.pick(Object.keys(CONFIG.CARS));
+    this.stripe = U.chance(0.4) ? U.pick(['#ffffff', '#111111', '#ffd166']) : null;
+    this.braking = false;
     this.lane = i % CONFIG.LANES;
     this.x = U.laneX(this.lane, CONFIG.LANES);
     this.targetX = this.x;
