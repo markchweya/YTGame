@@ -83,6 +83,8 @@ class Obstacle {
     this.length = t.length;
     this.damage = t.damage;
     this.hit = false;
+    this.hitAt = 0;      // game time of the hit, drives the knock-over animation
+    this.hitDir = 1;
     this.speed = 0;
     this.color = type === 'car' ? U.pick(['#8d99ae', '#4a4e69', '#c9ada7', '#22577a', '#3d5a80', '#e07a5f', '#f1f1f1']) : type === 'truck' ? U.pick(['#d9d9d9', '#b23a48', '#2f6f9f', '#f2b134']) : null;
     this.style = type === 'car' ? U.pick(Object.keys(CONFIG.CARS)) : null;
