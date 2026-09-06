@@ -58,9 +58,11 @@ function serve() {
     await page.waitForTimeout(50);
   }
   const result = await page.evaluate(() => window.NeonRush.game.result);
+  await page.waitForSelector('#results:not(.hidden)', { timeout: 5000 });
 
   // endless mode: run for a few seconds, then quit to the garage
-  await page.evaluate(() => window.NeonRush.game.quitToMenu());
+  await page.click('#btn-results-menu');
+  await page.waitForSelector('#menu:not(.hidden)');
   await page.click('.mode-card[data-mode="endless"]');
   await page.click('#btn-play');
   await page.waitForTimeout(8000); // ~3.4 s of start lights, then the car accelerates from rest
