@@ -200,6 +200,11 @@ class AudioEngine {
   bump() {
     this._noise({ dur: 0.2, vol: 0.25, cutoff: 600 });
   }
+  /* tyre screech for skids */
+  screech() {
+    this._noise({ dur: 0.5, vol: 0.14, cutoff: 3200 });
+    this._blip({ type: 'sawtooth', from: 1800, to: 1300, dur: 0.45, vol: 0.04 });
+  }
   /* two-tone car horn from traffic you get close to */
   horn() {
     this._blip({ type: 'sawtooth', from: 392, to: 392, dur: 0.28, vol: 0.07 });
