@@ -268,6 +268,8 @@ kbd { display: inline-block; min-width: 24px; text-align: center; padding: 3px 6
 .speedo-needle { fill: var(--amber); transform-origin: 100px 100px; transition: transform 0.08s linear; filter: drop-shadow(0 0 6px rgba(255, 138, 31, 0.8)); }
 .speedo-readout { position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; pointer-events: none; }
 .speedo-value { font-family: var(--display); font-weight: 900; font-size: 36px; line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9); }
+.speedo-value.shoulder { color: var(--warn); }
+.speedo-value.grass { color: var(--good); }
 .speedo-unit { font-family: var(--label); font-size: 10px; letter-spacing: 0.3em; color: var(--muted); font-weight: 700; margin-top: 1px; }
 .gear { font-family: var(--label); font-size: 10px; letter-spacing: 0.2em; color: var(--muted); font-weight: 700; margin-top: 3px; }
 .gear b { font-family: var(--display); font-size: 14px; font-weight: 900; color: var(--amber-2); margin-left: 2px; }
