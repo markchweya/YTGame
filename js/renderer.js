@@ -1050,24 +1050,6 @@ class Renderer {
         ctx.fillText('N', 0, -h * 0.5 - bob);
         break;
       }
-      case 'repair': {
-        const r = lw * 0.17;
-        const cy = -r * 1.3 - bob;
-        ctx.drawImage(Sprites.glow('#5ee07a', 96), -r * 2, cy - r * 2, r * 4, r * 4);
-        const g = ctx.createLinearGradient(-r, cy - r, r, cy + r);
-        g.addColorStop(0, '#f5fff7');
-        g.addColorStop(0.5, '#5ee07a');
-        g.addColorStop(1, '#1f8f3d');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(0, cy, r, 0, 6.283);
-        ctx.fill();
-        // medical cross
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(-r * 0.18, cy - r * 0.55, r * 0.36, r * 1.1);
-        ctx.fillRect(-r * 0.55, cy - r * 0.18, r * 1.1, r * 0.36);
-        break;
-      }
       case 'shield': {
         const r = lw * 0.18;
         ctx.drawImage(Sprites.glow('#8ea6ff', 96), -r * 2, -r * 1.3 - bob - r * 2, r * 4, r * 4);
