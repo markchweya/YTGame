@@ -301,6 +301,11 @@
   input.bindTouchButton($('touch-brake'), 'brake');
   input.bindTouchButton($('touch-nitro'), 'nitro');
 
+  /* ---- offline shell (only over http(s); file:// has no service workers) ---- */
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
   UI.show('menu');
   UI.refreshBest();
   window.NeonRush = { game, audio, input, Leaderboard, CONFIG, Sprites };
