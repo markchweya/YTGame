@@ -237,6 +237,7 @@ const UI = {
   },
 
   showResults(game, res, rankInfo) {
+    if (game.state !== 'finished') return; // player already restarted or quit while results were pending
     const e = this.el;
     const dnf = res.wrecked && res.mode === 'race';
     e['results-kicker'].textContent = res.kicker;
