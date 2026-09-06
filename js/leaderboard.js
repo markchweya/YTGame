@@ -31,6 +31,23 @@ class LocalLeaderboardProvider {
     all[mode] = [];
     Storage.set('leaderboard', all);
   }
+  /* Portable backup of the whole board (both modes). */
+  exportJSON() {
+    return JSON.stringify({ version: 1, exported: Date.now(), boards: this._all() }, null, 2);
+  }
+  importJSON(text) {
+    const data = JSON.parse(text);
+    if (!data || typeof data !== 'object' || !data.boards) throw new Error('Not a Neon Rush leaderboard export');
+    const all = this._all();
+    for (const mode of ['race', 'endless']) {
+      const incoming = Array.isArray(data.boards[mode]) ? data.boards[mode] : [];
+      const merged = [...(all[mode] || []), ...incoming.filter((e) => e && typeof e.score === 'number' && typeof e.name === 'string')];
+      merged.sort((a, b) => b.score - a.score || a.time - b.time);
+      all[mode] = merged.slice(0, this.max);
+    }
+    Storage.set('leaderboard', all);
+    return all;
+  }
 }
 
 /* Placeholder for the upcoming YouTube integration. Falls back to local storage
@@ -56,6 +73,13 @@ const Leaderboard = {
   },
   clear(mode) {
     return this.provider.clear(mode);
+  },
+  exportJSON() {
+    return this.provider.exportJSON ? this.provider.exportJSON() : '{}';
+  },
+  importJSON(text) {
+    if (!this.provider.importJSON) throw new Error('Provider does not support import');
+    return this.provider.importJSON(text);
   },
   async best(mode) {
     const l = await this.list(mode);
