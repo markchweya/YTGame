@@ -58,10 +58,21 @@ function serve() {
     await page.waitForTimeout(50);
   }
   const result = await page.evaluate(() => window.NeonRush.game.result);
+
+  // endless mode: run for a few seconds, then quit to the garage
+  await page.evaluate(() => window.NeonRush.game.quitToMenu());
+  await page.click('.mode-card[data-mode="endless"]');
+  await page.click('#btn-play');
+  await page.waitForTimeout(6000);
+  const endless = await page.evaluate(() => {
+    const g = window.NeonRush.game;
+    return { state: g.state, distance: Math.round(g.player.d) };
+  });
   await browser.close();
   srv.close();
 
   if (errors.length) { console.error('Page errors:\n' + errors.join('\n')); process.exit(1); }
   if (!result) { console.error('Race did not finish within the time limit'); process.exit(1); }
-  console.log('OK', JSON.stringify({ position: result.position, score: result.score, time: result.time }));
+  if (!['playing', 'finished'].includes(endless.state) || endless.distance < 50) { console.error('Endless mode did not run', endless); process.exit(1); }
+  console.log('OK', JSON.stringify({ position: result.position, score: result.score, time: result.time, endless }));
 })();
