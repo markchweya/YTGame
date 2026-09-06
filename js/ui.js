@@ -143,7 +143,15 @@ const UI = {
 
   updateLives(n) {
     const total = CONFIG.PLAYER.lives;
-    this.el['hud-lives'].innerHTML = Array.from({ length: total }, (_, i) => `<i class="${i < n ? '' : 'off'}"></i>`).join('');
+    const el = this.el['hud-lives'];
+    const prev = this._lives ?? n;
+    el.innerHTML = Array.from({ length: total }, (_, i) => `<i class="${i < n ? '' : 'off'}"></i>`).join('');
+    if (n !== prev) {
+      el.classList.remove('lost', 'gained');
+      void el.offsetWidth;
+      el.classList.add(n < prev ? 'lost' : 'gained');
+    }
+    this._lives = n;
   },
 
   updateShield(on) {
