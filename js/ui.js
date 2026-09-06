@@ -1,31 +1,58 @@
-/* DOM layer: screens, HUD, toasts, leaderboard tables, results. */
+/* DOM layer: screens, HUD, toasts, start lights, leaderboard tables, results. */
 const UI = {
   screens: ['menu', 'howto', 'leaderboard', 'pause', 'results', 'hud'],
   el: {},
   _speedoLen: 0,
+  _lastPos: null,
 
   init() {
     const ids = [
-      'hud', 'menu', 'howto', 'leaderboard', 'pause', 'results', 'countdown', 'toasts',
+      'hud', 'menu', 'howto', 'leaderboard', 'pause', 'results', 'toasts', 'startlights', 'startlights-text',
       'hud-position', 'hud-racers', 'hud-distance', 'hud-score', 'hud-time', 'hud-lives', 'hud-standings',
-      'hud-speed', 'speedo-fill', 'hud-nitro', 'hud-coins', 'hud-shield', 'hud-combo', 'race-progress', 'race-progress-wrap',
-      'menu-best', 'lb-body', 'lb-empty', 'results-kicker', 'results-position', 'results-title', 'results-rank',
-      'results-standings', 'res-score', 'res-distance', 'res-time', 'res-topspeed', 'res-coins', 'res-overtakes',
-      'touch-controls',
+      'hud-speed', 'speedo-fill', 'speedo-needle', 'speedo-ticks', 'hud-gear', 'hud-nitro', 'hud-coins', 'hud-shield', 'hud-combo',
+      'race-progress', 'race-progress-wrap', 'best-race', 'best-endless', 'lb-body', 'lb-empty',
+      'results-kicker', 'results-position', 'results-title', 'results-rank', 'results-standings',
+      'res-score', 'res-distance', 'res-time', 'res-topspeed', 'res-coins', 'res-overtakes', 'touch-controls',
     ];
     ids.forEach((id) => (this.el[id] = document.getElementById(id)));
     const path = this.el['speedo-fill'];
     this._speedoLen = path.getTotalLength();
     path.style.strokeDasharray = `${this._speedoLen}`;
     path.style.strokeDashoffset = `${this._speedoLen}`;
+    this._buildTicks();
+    this.el['hud-nitro'].innerHTML = Array.from({ length: 10 }, () => '<i></i>').join('');
+    this._segments = [...this.el['hud-nitro'].children];
     if (!U.isTouch()) this.el['touch-controls'].classList.add('hidden');
+  },
+
+  _buildTicks() {
+    const g = this.el['speedo-ticks'];
+    const maxKmh = 400;
+    const n = 20;
+    let svg = '';
+    for (let i = 0; i <= n; i++) {
+      // arc path runs 165° → 375° clockwise (SVG angles), matching the track path
+      const a = (165 + (i / n) * 210) * (Math.PI / 180);
+      const major = i % 5 === 0;
+      const r0 = major ? 62 : 66;
+      const r1 = 72;
+      const x0 = 100 + Math.cos(a) * r0, y0 = 100 + Math.sin(a) * r0;
+      const x1 = 100 + Math.cos(a) * r1, y1 = 100 + Math.sin(a) * r1;
+      svg += `<line class="${major ? 'major' : ''}" x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}"/>`;
+      if (major) {
+        const tx = 100 + Math.cos(a) * 50, ty = 100 + Math.sin(a) * 50;
+        svg += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${Math.round((i / n) * maxKmh)}</text>`;
+      }
+    }
+    g.innerHTML = svg;
   },
 
   show(id) {
     for (const s of this.screens) {
       const e = this.el[s];
       if (!e) continue;
-      if (s === id || (id !== 'menu' && s === 'hud' && ['pause', 'results'].includes(id))) e.classList.remove('hidden');
+      const keepHud = s === 'hud' && ['pause', 'results'].includes(id);
+      if (s === id || keepHud) e.classList.remove('hidden');
       else e.classList.add('hidden');
     }
     document.body.dataset.screen = id;
@@ -35,66 +62,88 @@ const UI = {
     this.show('hud');
     this.el['hud-racers'].textContent = game.rivals.length + 1;
     this.el['race-progress-wrap'].classList.toggle('hidden', game.mode !== 'race');
+    this._chips = null;
+    this.el['race-progress-wrap'].querySelectorAll('.rival-chip').forEach((c) => c.remove());
     this.updateLives(game.player.lives);
     this.updateShield(false);
     this.combo(0);
     this.el.toasts.innerHTML = '';
+    this._lastPos = null;
     this.updateStandings(game);
     this.updateHUD(game);
   },
 
+  /* start-light gantry: '3' → 2 red, '2' → 4 red, '1' → 5 red, 'GO!' → all green */
   countdown(text) {
-    const c = this.el.countdown;
-    c.textContent = text;
-    c.classList.remove('hidden', 'pop');
-    void c.offsetWidth; // restart animation
-    c.classList.add('pop');
+    const box = this.el.startlights;
+    const lights = [...box.querySelectorAll('.gantry i')];
+    const label = this.el['startlights-text'];
+    box.classList.remove('hidden');
+    const litCount = { 3: 2, 2: 4, 1: 5 }[text] ?? 5;
+    lights.forEach((l, i) => {
+      l.className = text === 'GO!' ? 'green' : i < litCount ? 'red' : '';
+    });
+    label.textContent = text === 'GO!' ? 'GO' : '';
+    label.classList.remove('pop');
+    void label.offsetWidth;
+    if (text === 'GO!') label.classList.add('pop');
     clearTimeout(this._cdTimer);
-    this._cdTimer = setTimeout(() => c.classList.add('hidden'), text === 'GO!' ? 700 : 900);
+    if (text === 'GO!') this._cdTimer = setTimeout(() => box.classList.add('hidden'), 900);
   },
 
   updateHUD(game) {
     const p = game.player;
     const e = this.el;
-    e['hud-position'].innerHTML = U.ordinalHTML(game.position);
+    if (game.position !== this._lastPos) {
+      e['hud-position'].textContent = game.position;
+      const pc = e['hud-position'].closest('.pos-cluster');
+      pc.classList.remove('bump');
+      void pc.offsetWidth;
+      pc.classList.add('bump');
+      this._lastPos = game.position;
+    }
     e['hud-distance'].textContent = U.fmtInt(p.d);
     e['hud-score'].textContent = U.fmtInt(game.score);
     e['hud-time'].textContent = U.fmtTime(game.elapsed);
-    e['hud-speed'].textContent = U.kmh(p.speed);
-    const frac = U.clamp(p.speed / (CONFIG.PLAYER.maxSpeed * CONFIG.PLAYER.nitroMult), 0, 1);
+    const kmh = U.kmh(p.speed);
+    e['hud-speed'].textContent = kmh;
+    const frac = U.clamp(kmh / 400, 0, 1);
     e['speedo-fill'].style.strokeDashoffset = `${this._speedoLen * (1 - frac)}`;
     e['speedo-fill'].classList.toggle('boost', p.nitroActive);
-    e['hud-nitro'].style.width = `${p.nitro * 100}%`;
+    e['speedo-needle'].style.transform = `rotate(${-105 + frac * 210}deg)`;
+    e['hud-gear'].textContent = kmh < 5 ? 'N' : Math.min(6, 1 + Math.floor(kmh / 55));
+    const on = Math.round(p.nitro * 10);
+    this._segments.forEach((s, i) => s.classList.toggle('on', i < on));
     e['hud-nitro'].classList.toggle('active', p.nitroActive);
     e['hud-coins'].textContent = game.coins;
     if (game.mode === 'race') {
       e['race-progress'].style.width = `${U.clamp(p.d / CONFIG.RACE.length, 0, 1) * 100}%`;
-      this._updateProgressDots(game);
+      this._updateChips(game);
     }
   },
 
-  _updateProgressDots(game) {
+  _updateChips(game) {
     const wrap = this.el['race-progress-wrap'];
-    if (!this._dots) {
-      this._dots = game.rivals.map((r) => {
+    if (!this._chips) {
+      const mk = (color, name, me) => {
         const d = document.createElement('i');
-        d.className = 'rival-dot';
-        d.style.background = r.color;
-        d.title = r.name;
+        d.className = 'rival-chip' + (me ? ' me' : '');
+        d.style.background = color;
+        d.textContent = name[0].toUpperCase();
+        d.title = name;
         wrap.appendChild(d);
         return d;
-      });
+      };
+      this._chips = game.rivals.map((r) => mk(r.color, r.name, false));
+      this._meChip = mk(game.player.color, game.playerName, true);
     }
-    game.rivals.forEach((r, i) => {
-      const dot = this._dots[i];
-      if (!dot) return;
-      dot.style.left = `${U.clamp(r.d / CONFIG.RACE.length, 0, 1) * 100}%`;
-    });
+    game.rivals.forEach((r, i) => (this._chips[i].style.left = `${U.clamp(r.d / CONFIG.RACE.length, 0, 1) * 100}%`));
+    this._meChip.style.left = `${U.clamp(game.player.d / CONFIG.RACE.length, 0, 1) * 100}%`;
   },
 
   updateLives(n) {
     const total = CONFIG.PLAYER.lives;
-    this.el['hud-lives'].innerHTML = Array.from({ length: total }, (_, i) => `<i class="life ${i < n ? 'on' : 'off'}">♥</i>`).join('');
+    this.el['hud-lives'].innerHTML = Array.from({ length: total }, (_, i) => `<i class="${i < n ? '' : 'off'}"></i>`).join('');
   },
 
   updateShield(on) {
@@ -108,10 +157,14 @@ const UI = {
       return;
     }
     const mult = Math.min(5, 1 + Math.floor(n / 4));
-    c.innerHTML = `<span>${n}× COMBO</span><small>×${mult} coins</small>`;
+    c.textContent = `${n}× COMBO · ×${mult}`;
     c.classList.remove('hidden', 'pop');
     void c.offsetWidth;
     c.classList.add('pop');
+  },
+
+  _standingRow(r, i, meta) {
+    return `<div class="standing ${r.me ? 'me' : ''}"><b>${i + 1}</b><i style="background:${r.color}"></i><span>${U.escapeHTML(r.name)}</span><em>${meta}</em></div>`;
   },
 
   updateStandings(game) {
@@ -120,8 +173,8 @@ const UI = {
     this.el['hud-standings'].innerHTML = rows
       .map((r, i) => {
         const gap = r.d - p.d;
-        const gapText = r.me ? 'YOU' : r.finish !== null ? '🏁' : `${gap >= 0 ? '+' : '−'}${U.fmtInt(Math.abs(gap))}m`;
-        return `<div class="standing ${r.me ? 'me' : ''}"><b>${i + 1}</b><i style="background:${r.color}"></i><span>${U.escapeHTML(r.name)}</span><em>${gapText}</em></div>`;
+        const meta = r.me ? 'YOU' : r.finish !== null ? 'FIN' : `${gap >= 0 ? '+' : '−'}${U.fmtInt(Math.abs(gap))}m`;
+        return this._standingRow(r, i, meta);
       })
       .join('');
   },
@@ -139,9 +192,10 @@ const UI = {
 
   showResults(game, res, rankInfo) {
     const e = this.el;
+    const dnf = res.wrecked && res.mode === 'race';
     e['results-kicker'].textContent = res.kicker;
-    e['results-position'].innerHTML = res.wrecked && res.mode === 'race' ? 'DNF' : U.ordinalHTML(res.position);
-    e['results-position'].className = 'results-position ' + (res.position === 1 && !res.wrecked ? 'gold' : res.position <= 3 && !res.wrecked ? 'silver' : '');
+    e['results-position'].textContent = dnf ? 'DNF' : `P${res.position}`;
+    e['results-position'].className = 'results-position ' + (dnf ? 'dnf' : res.position === 1 ? 'gold' : res.position <= 3 ? 'silver' : '');
     e['results-title'].textContent = res.title;
     e['res-score'].textContent = U.fmtInt(res.score);
     e['res-distance'].textContent = `${U.fmtInt(res.distance)} m`;
@@ -150,15 +204,12 @@ const UI = {
     e['res-coins'].textContent = res.coins;
     e['res-overtakes'].textContent = res.overtakes;
     if (rankInfo && rankInfo.rank) {
-      e['results-rank'].innerHTML = rankInfo.rank === 1 ? `🏆 <b>New #1 on the ${res.mode} leaderboard!</b>` : `📈 Ranked <b>#${rankInfo.rank}</b> on the ${res.mode} leaderboard`;
-      e['results-rank'].classList.remove('hidden');
+      e['results-rank'].innerHTML = rankInfo.rank === 1 ? `🏆 <b>New #1 on the ${res.mode} board</b>` : `Ranked <b>#${rankInfo.rank}</b> on the ${res.mode} board`;
     } else {
-      e['results-rank'].innerHTML = 'Not in the top 10 this time — push harder!';
+      e['results-rank'].textContent = 'Outside the top 10 — push harder.';
     }
     const rows = game.standings();
-    e['results-standings'].innerHTML = rows
-      .map((r, i) => `<div class="standing ${r.me ? 'me' : ''}"><b>${i + 1}</b><i style="background:${r.color}"></i><span>${U.escapeHTML(r.name)}</span><em>${r.finish !== null ? U.fmtTime(r.finish) : `${U.fmtInt(r.d)} m`}</em></div>`)
-      .join('');
+    e['results-standings'].innerHTML = rows.map((r, i) => this._standingRow(r, i, r.finish !== null ? U.fmtTime(r.finish) : `${U.fmtInt(r.d)} m`)).join('');
     this.show('results');
   },
 
@@ -168,16 +219,17 @@ const UI = {
     this.el['lb-empty'].classList.toggle('hidden', list.length > 0);
     body.innerHTML = list
       .map((r, i) => {
-        const detail = r.mode === 'race' ? `${r.wrecked ? 'DNF' : U.ordinal(r.position)} · ${U.fmtTime(r.time)}` : `${U.fmtInt(r.distance)} m · ${U.fmtTime(r.time)}`;
-        const medal = ['🥇', '🥈', '🥉'][i] || `${i + 1}`;
-        return `<tr class="${i < 3 ? 'top' : ''}"><td>${medal}</td><td>${U.escapeHTML(r.name)}</td><td>${U.fmtInt(r.score)}</td><td>${detail}</td></tr>`;
+        const detail = r.mode === 'race' ? `${r.wrecked ? 'DNF' : 'P' + r.position} · ${U.fmtTime(r.time)}` : `${U.fmtInt(r.distance)} m · ${U.fmtTime(r.time)}`;
+        return `<tr class="${i < 3 ? 'top' : ''}"><td>${i + 1}</td><td>${U.escapeHTML(r.name)}</td><td>${U.fmtInt(r.score)}</td><td>${detail}</td></tr>`;
       })
       .join('');
-    document.querySelectorAll('#lb-tabs .seg').forEach((b) => b.classList.toggle('active', b.dataset.mode === mode));
+    document.querySelectorAll('#lb-tabs .tab').forEach((b) => b.classList.toggle('active', b.dataset.mode === mode));
   },
 
-  async refreshBest(mode) {
-    const best = await Leaderboard.best(mode);
-    this.el['menu-best'].textContent = best ? `${U.fmtInt(best.score)} · ${best.name}` : '—';
+  async refreshBest() {
+    for (const mode of ['race', 'endless']) {
+      const best = await Leaderboard.best(mode);
+      this.el[`best-${mode}`].textContent = best ? `Best ${U.fmtInt(best.score)} · ${best.name}` : 'No record yet';
+    }
   },
 };
