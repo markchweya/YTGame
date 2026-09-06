@@ -311,7 +311,8 @@ class Game {
     const p = this.player;
     for (const r of this.rivals) {
       // speed model: track the player's cruise with a personal bias + rubber banding
-      let target = p.cruise * (1 + r.speedBias) * (this.mode === 'endless' ? 0.98 : 1.0);
+      const level = CONFIG.DIFFICULTY_LEVELS[this.difficulty] || CONFIG.DIFFICULTY_LEVELS.normal;
+      let target = p.cruise * (1 + r.speedBias + level.rivalBias) * (this.mode === 'endless' ? 0.98 : 1.0);
       const gap = r.d - p.d;
       if (gap < -R.rubberBandRange) target *= 1 + R.rubberBandStrength;
       else if (gap > R.rubberBandRange) target *= 1 - R.rubberBandStrength;
@@ -388,9 +389,10 @@ class Game {
     const p = this.player;
     const horizon = p.d + CONFIG.ROAD.viewRange + 40;
     const km = p.d / 1000;
+    const level = CONFIG.DIFFICULTY_LEVELS[this.difficulty] || CONFIG.DIFFICULTY_LEVELS.normal;
     while (this.nextSpawnD < horizon) {
       this.spawnGroup(this.nextSpawnD, km);
-      const gap = Math.max(D.spawnGapMin, D.spawnGapStart - D.spawnGapRampPerKm * km);
+      const gap = Math.max(D.spawnGapMin, D.spawnGapStart - D.spawnGapRampPerKm * km) * level.spawnGap;
       this.nextSpawnD += gap * U.rand(0.75, 1.3);
     }
   }
@@ -640,6 +642,7 @@ class Game {
       coins: this.coins,
       overtakes: this.overtakes,
       topSpeed: U.kmh(p.topSpeed),
+      difficulty: this.difficulty || 'normal',
       wrecked,
       title,
       kicker,
