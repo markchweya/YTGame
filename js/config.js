@@ -40,6 +40,7 @@ const CONFIG = {
     nitroStart: 0.35,
     oilSlideTime: 1.4,
     railBounce: 0.6,        // speed kept after hitting the guardrail
+    lowNitroLevel: 0.12,    // warning beep threshold while boosting
   },
 
   OFFROAD: {
