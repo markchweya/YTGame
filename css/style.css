@@ -343,6 +343,10 @@ kbd { display: inline-block; min-width: 24px; text-align: center; padding: 3px 6
 .touch-btn.brake { border-color: rgba(255, 77, 94, 0.5); color: var(--bad); }
 .touch-btn.active { background: rgba(255, 255, 255, 0.22); transform: scale(0.96); }
 
+/* low quality: drop the expensive blur filters */
+body[data-quality='low'] .panel, body[data-quality='low'] .overlay, body[data-quality='low'] .cluster, body[data-quality='low'] .standing, body[data-quality='low'] .toast, body[data-quality='low'] .touch-btn { backdrop-filter: none; -webkit-backdrop-filter: none; }
+body[data-quality='low'] .speedo-svg, body[data-quality='low'] .speedo-needle { filter: none; }
+
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
   .menu-panel { grid-template-columns: 1fr; gap: 20px; padding: 24px 20px; }
