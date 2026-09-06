@@ -316,15 +316,17 @@ class Game {
       if (gap < -R.rubberBandRange) target *= 1 + R.rubberBandStrength;
       else if (gap > R.rubberBandRange) target *= 1 - R.rubberBandStrength;
       r.burst = Math.max(0, r.burst - dt);
-      if (r.burst <= 0 && U.chance(0.004)) r.burst = U.rand(1.5, 3);
+      if (r.burst <= 0 && U.chance(r.traits.burstChance)) r.burst = U.rand(1.5, 3);
       if (r.burst > 0) target *= 1.12;
       r.bumpCooldown = Math.max(0, r.bumpCooldown - dt);
       if (r.finishTime !== null) target = p.cruise * 0.9;
       // keep a gap to a rival directly ahead in the same lane
       const tail = this.rivals.find((q) => q !== r && q.d > r.d && q.d - r.d < 10 && Math.abs(q.x - r.x) < 0.25);
       if (tail) target = Math.min(target, tail.speed * 0.95);
+      const prevSpeed = r.speed;
       if (r.speed < target) r.speed = Math.min(target, r.speed + R.accel * dt);
       else r.speed = U.damp(r.speed, target, 2.5, dt);
+      r.braking = r.speed < prevSpeed - 2 * dt; // decelerating noticeably → brake lights
       r.d += r.speed * dt;
 
       // lane changes + obstacle avoidance
@@ -344,7 +346,7 @@ class Game {
           r.lane = U.pick(options);
           r.targetX = U.laneX(r.lane, CONFIG.LANES);
         }
-        r.laneTimer = U.rand(...R.laneChangeInterval);
+        r.laneTimer = U.rand(...r.traits.laneChange);
       }
       r.x = U.damp(r.x, r.targetX, 3, dt);
 
