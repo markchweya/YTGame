@@ -848,6 +848,13 @@ class Renderer {
     const lw = this.laneW * p.s;
     ctx.save();
     ctx.translate(p.x, p.y);
+    // knocked-over cones and rocks tumble away from the car for a moment
+    if (o.hit && o.hitAt && (o.type === 'cone' || o.type === 'rock')) {
+      const k = U.clamp((time - o.hitAt) / 0.7, 0, 1);
+      ctx.translate(o.hitDir * lw * 0.9 * k, -Math.sin(k * Math.PI) * lw * 0.6);
+      ctx.rotate(o.hitDir * k * 3.2);
+      ctx.globalAlpha *= 1 - k * 0.6;
+    }
     switch (o.type) {
       case 'cone': {
         const w = lw * 0.3;
