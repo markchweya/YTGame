@@ -10,9 +10,21 @@
     Leaderboard.setProvider(new YouTubeLeaderboardProvider({ apiBase: CONFIG.YOUTUBE.apiBase }));
   }
 
-  const game = new Game({ canvas, input, audio, ui: UI });
-  // rasterise car/truck/glow sprites while the menu is up instead of mid-race
-  (window.requestIdleCallback || ((fn) => setTimeout(fn, 200)))(() => Sprites.preload());
+  // WebGL renderer when available, 2D canvas renderer otherwise
+  const use3D = CONFIG.RENDER3D.enabled && typeof Renderer3D !== 'undefined' && Renderer3D.available();
+  let renderer = null;
+  if (use3D) {
+    try {
+      renderer = new Renderer3D(canvas);
+    } catch (err) {
+      console.warn('3D renderer failed, falling back to 2D', err);
+      renderer = null;
+    }
+  }
+  const game = new Game({ canvas, input, audio, ui: UI, renderer });
+  document.body.dataset.renderer = renderer ? '3d' : '2d';
+  // rasterise car/truck/glow sprites while the menu is up instead of mid-race (2D fallback)
+  if (!renderer) (window.requestIdleCallback || ((fn) => setTimeout(fn, 200)))(() => Sprites.preload());
 
   /* ---- persisted settings ---- */
   let mode = Storage.get('mode', 'race');
@@ -90,9 +102,28 @@
 
   /* ---- garage showcase (turntable) ---- */
   const show = $('showcase');
-  const sctx = show.getContext('2d');
+  let show3d = null;
+  if (renderer) {
+    try {
+      show3d = Renderer3D.showcase(show);
+    } catch (err) {
+      console.warn('3D showcase unavailable', err);
+    }
+  }
+  const sctx = show3d ? null : show.getContext('2d');
+  let showKey = '';
   const drawShowcase = (t) => {
     if (UI.el.menu.classList.contains('hidden')) {
+      requestAnimationFrame(drawShowcase);
+      return;
+    }
+    if (show3d) {
+      const key = `${color}:${style}`;
+      if (key !== showKey) {
+        showKey = key;
+        show3d.setCar(color, style);
+      }
+      show3d.render(t);
       requestAnimationFrame(drawShowcase);
       return;
     }
