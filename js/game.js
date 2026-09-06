@@ -381,11 +381,13 @@ class Game {
     if (roll < D.trafficChance) {
       // slow traffic car(s)
       const n = km > 1 && U.chance(0.35) ? 2 : 1;
+      const OB = CONFIG.OBSTACLES;
       for (let i = 0; i < n; i++) {
         const lane = U.pick([...free]);
         free.delete(lane);
-        const car = new Obstacle('car', lane, d + i * 9);
-        car.speed = this.player.cruise * U.rand(0.5, 0.68);
+        const truck = i === 0 && U.chance(OB.truckChance);
+        const car = new Obstacle(truck ? 'truck' : 'car', lane, d + i * 12);
+        car.speed = this.player.cruise * (truck ? U.rand(...OB.truckSpeedRange) : U.rand(0.5, 0.68));
         this.obstacles.push(car);
       }
     } else {
@@ -422,7 +424,7 @@ class Game {
   updateObstacles(dt) {
     const p = this.player;
     for (const o of this.obstacles) {
-      if (o.type === 'car') o.d += o.speed * dt;
+      if (o.speed) o.d += o.speed * dt;
     }
     this.obstacles = this.obstacles.filter((o) => o.d > p.d - 40);
     this.pickups = this.pickups.filter((k) => !k.taken && k.d > p.d - 20);
