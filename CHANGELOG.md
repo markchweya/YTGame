@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Removed lives. Crashes cost speed and points; you always reach the flag.
+- Endless is now a two-minute time attack with a countdown on the HUD.
+- Hitting another vehicle is silent; other crashes keep their sound.
+- Repair pickup removed (nothing left to repair).
+
 ## 0.3.0 — Traffic, settings and splits
 
 - Trucks in traffic, puddles that splash, rare repair pickups.
