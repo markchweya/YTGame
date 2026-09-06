@@ -25,9 +25,23 @@ Every moving thing has two coordinates:
 Distance is unbounded; obstacles, pickups and roadside props are generated ahead of
 the player and dropped once passed.
 
-## Projection
+## Rendering
 
-The renderer is a classic pseudo-3D road. For an object at distance `d`:
+Two renderers share the same simulation:
+
+- `Renderer3D` (`js/renderer3d.js`, Three.js) is used whenever WebGL is available.
+  The player sits at the origin facing -z. Every frame the road ribbons, guardrails,
+  instanced props and entity meshes are positioned by
+  `(x * RW + curve(dz), hill(dz), -dz)` with `dz = d - player.d`, so curves and hills
+  are the same functions the 2D renderer uses, just in metres. Cars are procedural
+  meshes (extruded body and cabin profiles, wheels, emissive lights) lit by a sun with
+  shadows, a fill light and an environment map baked from the sky shader.
+- `Renderer` (`js/renderer.js`) is the 2D fallback and also owns the transparent
+  overlay canvas used for particles, flash and vignette in both modes.
+
+## Projection (2D fallback)
+
+The 2D renderer is a classic pseudo-3D road. For an object at distance `d`:
 
 ```
 z      = zNear + (d - player.d) * zPerMeter

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- WebGL renderer on Three.js: real 3D car models with paint, glass, wheels and lights,
+  sun shadows, environment reflections, headlight beams, textured road mesh, instanced
+  trees and lamp posts, 3D garage turntable. 2D renderer kept as fallback.
 - Removed lives. Crashes cost speed and points; you always reach the flag.
 - Endless is now a two-minute time attack with a countdown on the HUD.
 - Hitting another vehicle is silent; other crashes keep their sound.

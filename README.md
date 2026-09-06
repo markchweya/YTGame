@@ -37,9 +37,11 @@ move between browsers until the online board lands.
 
 ## What's in the game
 
-- **Highway rendering** — perspective-mapped asphalt, painted lines, gravel shoulders,
-  grass, guardrails, lamp posts with light pools, trees, road signs, billboards,
-  overpasses, hills and curves under a dusk sky.
+- **Real 3D** — a WebGL renderer built on Three.js (vendored, no build step): car
+  models with metallic paint, glass, wheels and lights; sun shadows; an environment map
+  baked from the sky for reflections; headlight beams; a textured road mesh with hills,
+  curves, guardrails, instanced trees and lamp posts, signs, billboards and overpasses.
+  If WebGL is unavailable the game falls back to the 2D pseudo-3D renderer.
 - **Off-road driving** — leave the asphalt and you lose speed on gravel, more on grass,
   and bounce off the guardrail.
 - **Competition** — five named rivals with their own body styles, speed bias, bursts,
@@ -70,7 +72,9 @@ js/audio.js           Web Audio engine + SFX
 js/input.js           keyboard + touch
 js/entities.js        Player, Rival, Obstacle, Pickup, Particle
 js/sprites.js         pre-rendered car sprites and glow sprites
-js/renderer.js        canvas rendering: road, scenery, props, cars, post effects
+js/renderer.js        2D fallback renderer (also provides the particle/flash overlay)
+js/renderer3d.js      WebGL renderer: road mesh, car models, props, lighting, turntable
+vendor/three.min.js   Three.js r158 (MIT), vendored
 js/ui.js              DOM/HUD layer
 js/game.js            simulation: state machine, spawning, AI, collisions, scoring
 js/main.js            bootstrap and garage wiring
