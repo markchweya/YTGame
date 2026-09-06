@@ -534,6 +534,18 @@ class Game {
         this.ui.updateShield(true);
         this.audio.shield();
         break;
+      case 'repair':
+        if (p.lives < CONFIG.PLAYER.lives) {
+          p.lives++;
+          this.ui.updateLives(p.lives);
+          this.spawnText('+1 LIFE', '#5ee07a');
+          this.ui.toast('Repaired — life restored', 'good');
+        } else {
+          this.score += S.coin * 5;
+          this.spawnText('+' + S.coin * 5, '#5ee07a');
+        }
+        this.audio.repair();
+        break;
     }
   }
 
