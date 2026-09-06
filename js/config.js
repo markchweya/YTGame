@@ -89,6 +89,7 @@ const CONFIG = {
   RACE: {
     length: 3000,
     positionScores: [1000, 700, 500, 350, 250, 150],
+    sectorLength: 1000,     // a split time is shown every sector
   },
 
   SCORE: {
