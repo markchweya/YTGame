@@ -14,6 +14,7 @@ class Renderer {
     this.mountainsFar = [];
     this.mountainsNear = [];
     this.clouds = [];
+    this.quality = 'high'; // 'high' | 'low' — low halves slice count and skips post blur
     this.resize();
     window.addEventListener('resize', () => this.resize());
   }
@@ -251,7 +252,7 @@ class Renderer {
   buildSlices(game) {
     const R = CONFIG.ROAD;
     const { W, H, horizonY, playerY, nearHalfW } = this;
-    const N = 120;
+    const N = this.quality === 'low' ? 64 : 120;
     const sMin = R.zNear / R.zFar;
     const sMax = (H + 30 - horizonY) / (playerY - horizonY);
     const cam = this.camX(game);
@@ -1081,7 +1082,7 @@ class Renderer {
 
     // nitro / high-speed radial zoom blur toward the vanishing point
     const boost = p.nitroActive ? 1 : U.clamp((p.speed - CONFIG.PLAYER.maxSpeed * 0.92) / 25, 0, 0.5);
-    if (boost > 0.02 && game.state !== 'menu') {
+    if (boost > 0.02 && game.state !== 'menu' && this.quality !== 'low') {
       const vx = W / 2 + this.curveOffset(CONFIG.ROAD.zFar, game.curve) * 0.6;
       const vy = this.horizonY;
       ctx.save();
