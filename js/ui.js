@@ -240,7 +240,8 @@ const UI = {
     if (game.state !== 'finished') return; // player already restarted or quit while results were pending
     const e = this.el;
     const dnf = res.wrecked && res.mode === 'race';
-    e['results-kicker'].textContent = res.kicker;
+    const level = CONFIG.DIFFICULTY_LEVELS[res.difficulty];
+    e['results-kicker'].textContent = level && res.difficulty !== 'normal' ? `${res.kicker} · ${level.label.toUpperCase()}` : res.kicker;
     e['results-position'].textContent = dnf ? 'DNF' : `P${res.position}`;
     e['results-position'].className = 'results-position ' + (dnf ? 'dnf' : res.position === 1 ? 'gold' : res.position <= 3 ? 'silver' : '');
     e['results-title'].textContent = res.title;
