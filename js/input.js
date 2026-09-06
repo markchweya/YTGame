@@ -44,16 +44,39 @@ class Input {
     el.addEventListener('contextmenu', (e) => e.preventDefault());
   }
 
+  /* Gamepad (standard mapping): left stick / d-pad steer, A or RT = nitro, B/X or LT = brake, Start = pause. */
+  _pad() {
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    for (const p of pads) if (p && p.connected) return p;
+    return null;
+  }
+  get pad() {
+    const p = this._pad();
+    if (!p) return { x: 0, nitro: false, brake: false };
+    const dz = 0.25;
+    const axis = p.axes[0] || 0;
+    const x = Math.abs(axis) > dz ? axis : (p.buttons[14]?.pressed ? -1 : 0) + (p.buttons[15]?.pressed ? 1 : 0);
+    const start = p.buttons[9]?.pressed;
+    if (start && !this._padStart && this.onPause) this.onPause();
+    this._padStart = !!start;
+    if ((x || p.buttons[0]?.pressed) && this.onAny) this.onAny();
+    return {
+      x,
+      nitro: !!(p.buttons[0]?.pressed || (p.buttons[7]?.value || 0) > 0.3),
+      brake: !!(p.buttons[1]?.pressed || p.buttons[2]?.pressed || (p.buttons[6]?.value || 0) > 0.3),
+    };
+  }
+
   get left() {
-    return this.keys.has('arrowleft') || this.keys.has('a') || this.touch.left;
+    return this.keys.has('arrowleft') || this.keys.has('a') || this.touch.left || this.pad.x < -0.5;
   }
   get right() {
-    return this.keys.has('arrowright') || this.keys.has('d') || this.touch.right;
+    return this.keys.has('arrowright') || this.keys.has('d') || this.touch.right || this.pad.x > 0.5;
   }
   get brake() {
-    return this.keys.has('arrowdown') || this.keys.has('s') || this.touch.brake;
+    return this.keys.has('arrowdown') || this.keys.has('s') || this.touch.brake || this.pad.brake;
   }
   get nitro() {
-    return this.keys.has('shift') || this.keys.has(' ') || this.keys.has('arrowup') || this.keys.has('w') || this.touch.nitro;
+    return this.keys.has('shift') || this.keys.has(' ') || this.keys.has('arrowup') || this.keys.has('w') || this.touch.nitro || this.pad.nitro;
   }
 }
