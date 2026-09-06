@@ -20,7 +20,8 @@ most and what they do.
 | `DIFFICULTY.spawnGapStart` / `spawnGapMin` / `spawnGapRampPerKm` | Metres between obstacle groups and how quickly they tighten. |
 | `DIFFICULTY.trafficChance` / `pickupChance` | Share of groups that are traffic, and chance of a pickup line. |
 | `DIFFICULTY_LEVELS` | Easy / Normal / Hard presets: multiply spawn gaps and shift rival pace. |
-| `PLAYER.lives` / `invulnTime` / `crashSpeedMult` | Damage model. |
+| `PLAYER.invulnTime` / `crashSpeedMult` / `SCORE.crashPenalty` | Damage model: no lives, a crash costs speed and points. |
+| `ENDLESS.duration` | Length of the Endless time attack in seconds. |
 
 ## Rivals
 
