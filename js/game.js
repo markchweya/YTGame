@@ -209,6 +209,11 @@ class Game {
     if (p.nitroActive) {
       if (!p._nitroWas) this.audio.nitro();
       p.nitro = Math.max(0, p.nitro - (P.nitroDrain / st.nitro) * dt);
+      if (p.nitro < P.lowNitroLevel && !p.lowNitroWarned) {
+        p.lowNitroWarned = true;
+        this.audio.lowNitro();
+      }
+      if (p.nitro > P.lowNitroLevel * 2) p.lowNitroWarned = false;
       if (Math.random() < 0.6) this.spawnNitroTrail();
     } else {
       p.nitro = Math.min(1, p.nitro + 0.015 * dt);
@@ -222,6 +227,8 @@ class Game {
     const wasOff = p.offroad;
     p.offroad = ax + p.halfWidth * 0.5 > R.shoulder ? 2 : ax + p.halfWidth * 0.5 > 1 ? 1 : 0;
     if (p.offroad && !wasOff) this.ui.toast(p.offroad === 2 ? 'Off road!' : 'On the shoulder', 'warn');
+    if (p.offroad !== wasOff) this.ui.updateSurface(p.offroad);
+    this.audio.setRumble(p.offroad ? (p.offroad === 2 ? 1 : 0.55) * U.clamp(p.speed / 40, 0, 1) : 0);
 
     let target = p.cruise * (p.nitroActive ? P.nitroMult : 1);
     if (p.offroad) target *= p.offroad === 2 ? O.grassSpeedMult : O.shoulderSpeedMult;
@@ -265,7 +272,7 @@ class Game {
         p.railCooldown = 0.6;
         this.shake = Math.max(this.shake, 0.7);
         this.spawnSparks(side, 18);
-        this.audio.bump();
+        this.audio.rail();
         this.ui.toast('Guardrail!', 'bad');
       }
     }
