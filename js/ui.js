@@ -179,6 +179,15 @@ const UI = {
       .join('');
   },
 
+  /* Big centre banner for milestones, e.g. banner('SECTOR 1', '0:24.1') */
+  banner(title, sub = '') {
+    const b = document.createElement('div');
+    b.className = 'banner';
+    b.innerHTML = `${U.escapeHTML(title)}${sub ? `<small>${U.escapeHTML(sub)}</small>` : ''}`;
+    this.el.hud.appendChild(b);
+    setTimeout(() => b.remove(), 1700);
+  },
+
   toast(text, cls = '') {
     const box = this.el.toasts;
     const t = document.createElement('div');
