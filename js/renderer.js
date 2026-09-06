@@ -221,6 +221,25 @@ class Renderer {
       ctx.restore();
     }
 
+    // a small flock of birds drifting across the sky
+    const B = CONFIG.BIRDS;
+    if (B && B.count > 0) {
+      ctx.strokeStyle = 'rgba(20,20,40,0.7)';
+      ctx.lineWidth = 1.2;
+      const fx = ((t * B.speed) % 1.4) * W - W * 0.2 + par * 0.3;
+      const fy = horizonY * B.height;
+      for (let i = 0; i < B.count; i++) {
+        const bx = fx - i * 14 + (i % 2) * 6;
+        const by = fy + Math.abs(i - B.count / 2) * 5 + Math.sin(t * 6 + i) * 1.5;
+        const flap = Math.sin(t * 9 + i * 0.7) * 2.5;
+        ctx.beginPath();
+        ctx.moveTo(bx - 5, by + flap);
+        ctx.lineTo(bx, by);
+        ctx.lineTo(bx + 5, by + flap);
+        ctx.stroke();
+      }
+    }
+
     // mountains (two layers, atmospheric perspective)
     this._ridge(this.mountainsFar, par * 0.5, '#4e5f8e', '#3b4a75', horizonY);
     this._ridge(this.mountainsNear, par * 0.8, '#2b3557', '#1e2540', horizonY);
