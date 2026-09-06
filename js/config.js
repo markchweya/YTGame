@@ -75,7 +75,12 @@ const CONFIG = {
 
   RIVALS: {
     count: 5,
-    names: ['Blaze', 'Kira', 'Zed', 'Nova', 'Ryu', 'Vex', 'Mika', 'Onyx', 'Juno', 'Rex'],
+    names: ['Blaze', 'Kira', 'Zed', 'Nova', 'Ryu', 'Vex', 'Mika', 'Onyx', 'Juno', 'Rex', 'Sable', 'Dax', 'Lumi', 'Kato', 'Ivy', 'Rook'],
+    personalities: {
+      steady: { laneChange: [4, 8], burstChance: 0.002, bias: 0 },
+      aggressive: { laneChange: [1.6, 3.5], burstChance: 0.007, bias: 0.02 },
+      cautious: { laneChange: [5, 9], burstChance: 0.001, bias: -0.03 },
+    },
     colors: ['#e63946', '#f4a261', '#2a9d8f', '#e0e0e6', '#ffd166', '#8338ec'],
     speedBias: [-0.12, 0.05],
     accel: 14,
