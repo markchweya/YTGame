@@ -394,8 +394,7 @@ class Game {
         if (r.d > p.d) p.speed *= R.bumpSpeedMult;
         else r.speed *= R.bumpSpeedMult;
         this.shake = Math.max(this.shake, 0.4);
-        this.spawnSparks(dir, 10);
-        this.audio.bump();
+        this.spawnSparks(dir, 10); // car-to-car contact is silent by design
       }
     }
   }
@@ -537,7 +536,7 @@ class Game {
       this.audio.shield();
       return;
     }
-    p.lives--;
+    // no lives: a crash costs speed and points, then you keep racing
     p.speed *= P.crashSpeedMult;
     p.invuln = P.invulnTime;
     this.crashes++;
@@ -549,9 +548,9 @@ class Game {
     this.shake = 1;
     this.spawnSparks(0, 26);
     this.spawnText('-' + CONFIG.SCORE.crashPenalty, '#ff5e5e');
-    this.audio.crash();
-    this.ui.updateLives(p.lives);
-    this.ui.toast(p.lives > 0 ? `Crash! ${p.lives} ${p.lives === 1 ? 'life' : 'lives'} left` : 'Wrecked!', 'bad');
+    const vehicle = o.type === 'car' || o.type === 'truck';
+    if (!vehicle) this.audio.crash(); // hitting another vehicle makes no sound
+    this.ui.toast(`Crash! -${CONFIG.SCORE.crashPenalty}`, 'bad');
   }
 
   takePickup(k) {
@@ -580,18 +579,6 @@ class Game {
         this.spawnText('SHIELD', '#9bb8ff');
         this.ui.updateShield(true);
         this.audio.shield();
-        break;
-      case 'repair':
-        if (p.lives < CONFIG.PLAYER.lives) {
-          p.lives++;
-          this.ui.updateLives(p.lives);
-          this.spawnText('+1 LIFE', '#5ee07a');
-          this.ui.toast('Repaired — life restored', 'good');
-        } else {
-          this.score += S.coin * 5;
-          this.spawnText('+' + S.coin * 5, '#5ee07a');
-        }
-        this.audio.repair();
         break;
     }
   }
@@ -626,31 +613,34 @@ class Game {
     const p = this.player;
     if (this.mode === 'race' && p.d >= CONFIG.RACE.length) {
       p.finished = true;
-      this.finishRun(false);
-    } else if (p.lives <= 0) {
-      this.finishRun(true);
+      this.finishRun();
+    } else if (this.mode === 'endless' && this.elapsed >= CONFIG.ENDLESS.duration) {
+      this.finishRun();
     }
   }
 
-  finishRun(wrecked) {
+  get timeLeft() {
+    return this.mode === 'endless' ? Math.max(0, CONFIG.ENDLESS.duration - this.elapsed) : null;
+  }
+
+  finishRun() {
     const p = this.player;
     const S = CONFIG.SCORE;
     const position = this.position;
     let score = this.score;
     let title;
     let kicker;
-    if (this.mode === 'race' && !wrecked) {
+    if (this.mode === 'race') {
       score += CONFIG.RACE.positionScores[Math.min(position, CONFIG.RACE.positionScores.length) - 1] || 0;
       score += Math.max(0, S.raceParTime - this.elapsed) * S.timeBonusRace;
       kicker = 'RACE COMPLETE';
       title = position === 1 ? 'Champion!' : position <= 3 ? 'Podium finish!' : 'Race finished';
-      this.audio.finish();
-      if (position <= 3) this.spawnConfetti(160);
     } else {
-      kicker = this.mode === 'race' ? 'DID NOT FINISH' : 'GAME OVER';
-      title = this.mode === 'race' ? 'Wrecked before the line' : `Survived ${U.fmtInt(p.d)} m`;
-      this.audio.gameOver();
+      kicker = 'TIME UP';
+      title = `${U.fmtInt(p.d)} m in ${Math.round(CONFIG.ENDLESS.duration)} s`;
     }
+    this.audio.finish();
+    if (position <= 3) this.spawnConfetti(160);
     this.result = {
       name: this.playerName,
       mode: this.mode,
@@ -663,7 +653,7 @@ class Game {
       overtakes: this.overtakes,
       topSpeed: U.kmh(p.topSpeed),
       difficulty: this.difficulty || 'normal',
-      wrecked,
+      crashes: this.crashes,
       title,
       kicker,
       date: Date.now(),
