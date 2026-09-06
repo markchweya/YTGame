@@ -205,4 +205,9 @@ class AudioEngine {
   click() {
     this._blip({ type: 'sine', from: 700, to: 500, dur: 0.06, vol: 0.08 });
   }
+  /* short rising chime for a sector split */
+  sector() {
+    this._blip({ type: 'triangle', from: 740, to: 740, dur: 0.1, vol: 0.14 });
+    this._blip({ type: 'triangle', from: 988, to: 988, dur: 0.16, vol: 0.14, delay: 0.09 });
+  }
 }
