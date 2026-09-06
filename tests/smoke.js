@@ -27,24 +27,27 @@ function serve() {
 (async () => {
   const srv = await serve();
   const url = `http://localhost:${srv.address().port}/`;
-  const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
-  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  // software WebGL so the 3D renderer is exercised in headless CI too
+  const launch = { args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] };
+  if (process.env.CHROMIUM_PATH) launch.executablePath = process.env.CHROMIUM_PATH;
+  const browser = await chromium.launch(launch);
+  const page = await browser.newPage({ viewport: { width: 800, height: 450 }, deviceScaleFactor: 1 });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto(url);
   // settings panel opens, toggles quality, and closes cleanly
   await page.click('#btn-settings');
   await page.waitForSelector('#settings:not(.hidden)');
-  await page.selectOption('#set-quality', 'low');
   await page.selectOption('#set-quality', 'high');
+  await page.selectOption('#set-quality', 'low'); // keep low for the run: software WebGL is slow
   await page.click('#btn-settings-back');
   await page.waitForSelector('#menu:not(.hidden)');
-  await page.evaluate(() => (window.NeonRush.CONFIG.RACE.length = 500));
+  await page.evaluate(() => (window.NeonRush.CONFIG.RACE.length = 400));
   await page.fill('#input-name', 'Bot');
   await page.click('#btn-play');
 
   const t0 = Date.now();
-  while (Date.now() - t0 < 60000) {
+  while (Date.now() - t0 < 240000) { // generous: software WebGL runs at a few fps
     const st = await page.evaluate(() => {
       const g = window.NeonRush.game;
       if (g.state !== 'playing') return { state: g.state };
@@ -65,25 +68,34 @@ function serve() {
     await page.waitForTimeout(50);
   }
   const result = await page.evaluate(() => window.NeonRush.game.result);
-  await page.waitForSelector('#results:not(.hidden)', { timeout: 5000 });
+  if (!result) { console.error('Race did not finish within the time limit'); await browser.close(); srv.close(); process.exit(1); }
+  await page.waitForSelector('#results:not(.hidden)', { timeout: 15000 });
+  const rendererKind = await page.evaluate(() => document.body.dataset.renderer);
   const board = await page.evaluate(() => window.NeonRush.Leaderboard.list('race'));
   if (!board.length || board[0].name !== 'Bot') { console.error('Run was not recorded on the leaderboard', board); process.exit(1); }
 
   // endless mode: run for a few seconds, then quit to the garage
   await page.click('#btn-results-menu');
   await page.waitForSelector('#menu:not(.hidden)');
-  await page.click('.mode-card[data-mode="endless"]');
-  await page.click('#btn-play');
-  await page.waitForTimeout(8000); // ~3.4 s of start lights, then the car accelerates from rest
-  const endless = await page.evaluate(() => {
-    const g = window.NeonRush.game;
-    return { state: g.state, distance: Math.round(g.player.d) };
-  });
+  // the menu overlay scrolls at small viewports, so click through the DOM
+  await page.evaluate(() => document.querySelector('.mode-card[data-mode="endless"]').click());
+  await page.evaluate(() => document.getElementById('btn-play').click());
+  // wait through the start lights and a few seconds of driving (slow under software WebGL)
+  let endless = { state: '', distance: 0 };
+  const t1 = Date.now();
+  while (Date.now() - t1 < 150000) {
+    endless = await page.evaluate(() => {
+      const g = window.NeonRush.game;
+      return { state: g.state, distance: Math.round(g.player.d) };
+    });
+    if (endless.state === 'playing' && endless.distance >= 25) break;
+    await page.waitForTimeout(500);
+  }
   await browser.close();
   srv.close();
 
   if (errors.length) { console.error('Page errors:\n' + errors.join('\n')); process.exit(1); }
   if (!result) { console.error('Race did not finish within the time limit'); process.exit(1); }
   if (!['playing', 'finished'].includes(endless.state) || endless.distance < 25) { console.error('Endless mode did not run', endless); process.exit(1); }
-  console.log('OK', JSON.stringify({ position: result.position, score: result.score, time: result.time, endless }));
+  console.log('OK', JSON.stringify({ renderer: rendererKind, position: result.position, score: result.score, time: result.time, endless }));
 })();
