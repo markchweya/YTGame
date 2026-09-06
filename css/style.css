@@ -261,13 +261,9 @@ kbd { display: inline-block; min-width: 24px; text-align: center; padding: 3px 6
 
 .time-cluster { display: grid; gap: 6px; padding: 8px 14px; text-align: right; border-right: 3px solid var(--teal); }
 .time-row { display: grid; gap: 2px; }
-.health { display: flex; gap: 4px; justify-content: flex-end; }
-.health i { width: 26px; height: 8px; background: var(--bad); box-shadow: 0 0 10px rgba(255, 77, 94, 0.6); transition: opacity 0.2s, background 0.2s; clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%); }
-.health i.off { background: rgba(255, 255, 255, 0.12); box-shadow: none; }
-.health.lost { animation: health-lost 0.5s ease; }
-.health.gained { animation: health-gained 0.6s ease; }
-@keyframes health-lost { 0%, 40%, 80% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } }
-@keyframes health-gained { 30% { transform: scale(1.15); filter: brightness(1.6); } }
+.crash-row { display: flex; justify-content: flex-end; align-items: baseline; gap: 8px; }
+.crash-row b { font-family: var(--display); font-size: 14px; color: var(--bad); font-variant-numeric: tabular-nums; }
+.hud-num.urgent { color: var(--bad); animation: pulse 0.5s infinite alternate; }
 .shield-tag { font-family: var(--label); font-size: 11px; font-weight: 700; letter-spacing: 0.2em; color: #9bb8ff; animation: pulse 1s infinite alternate; }
 @keyframes pulse { from { opacity: 0.55; } to { opacity: 1; } }
 
@@ -364,6 +360,7 @@ body[data-quality='low'] .speedo-svg, body[data-quality='low'] .speedo-needle { 
   .panel { padding: 22px 18px 18px; }
   .hud-top { grid-template-columns: auto 1fr; }
   .time-cluster { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; gap: 14px; padding: 6px 12px; border-right: 0; }
+  .results-grid { grid-template-columns: repeat(2, 1fr); }
   .time-row { grid-auto-flow: column; align-items: baseline; gap: 6px; }
   .time-row .hud-num { font-size: 18px; }
   .track-cluster { grid-template-columns: 1fr 1fr; padding: 8px 12px; }
