@@ -1,7 +1,8 @@
 /* Core simulation: state machine, spawning, AI rivals, collisions, scoring. */
 class Game {
-  constructor({ canvas, input, audio, ui }) {
-    this.renderer = new Renderer(canvas);
+  constructor({ canvas, input, audio, ui, renderer }) {
+    this.renderer = renderer || new Renderer(canvas);
+    this.dt = 1 / 60;
     this.input = input;
     this.audio = audio;
     this.ui = ui;
@@ -95,8 +96,9 @@ class Game {
 
   /* ---------- main loop ---------- */
   loop(now) {
-    const dt = Math.min(0.05, (now - this._last) / 1000 || 0);
+    const dt = Math.min(0.1, (now - this._last) / 1000 || 0); // clamp so a stalled tab can't teleport the car
     this._last = now;
+    this.dt = dt;
     this.time += dt;
     if (this.state !== 'paused') this.update(dt);
     if (this.shakeEnabled === false) this.shake = 0;
