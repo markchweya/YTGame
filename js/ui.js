@@ -10,11 +10,11 @@ const UI = {
   init() {
     const ids = [
       'hud', 'menu', 'howto', 'leaderboard', 'pause', 'results', 'toasts', 'startlights', 'startlights-text',
-      'hud-position', 'hud-racers', 'hud-distance', 'hud-score', 'hud-time', 'hud-lives', 'hud-standings',
+      'hud-position', 'hud-racers', 'hud-distance', 'hud-score', 'hud-time', 'hud-time-label', 'hud-crashes', 'hud-standings',
       'hud-speed', 'speedo-fill', 'speedo-needle', 'speedo-ticks', 'hud-gear', 'hud-nitro', 'hud-coins', 'hud-shield', 'hud-combo',
       'race-progress', 'race-progress-wrap', 'best-race', 'best-endless', 'lb-body', 'lb-empty',
       'results-kicker', 'results-position', 'results-title', 'results-rank', 'results-standings',
-      'res-score', 'res-distance', 'res-time', 'res-topspeed', 'res-coins', 'res-overtakes', 'touch-controls', 'settings', 'hud-fps', 'results-sectors',
+      'res-score', 'res-distance', 'res-time', 'res-topspeed', 'res-coins', 'res-overtakes', 'res-crashes', 'touch-controls', 'settings', 'hud-fps', 'results-sectors',
     ];
     ids.forEach((id) => (this.el[id] = document.getElementById(id)));
     const path = this.el['speedo-fill'];
@@ -66,7 +66,8 @@ const UI = {
     this.el['race-progress-wrap'].classList.toggle('hidden', game.mode !== 'race');
     this._chips = null;
     this.el['race-progress-wrap'].querySelectorAll('.rival-chip').forEach((c) => c.remove());
-    this.updateLives(game.player.lives);
+    this.el['hud-time-label'].textContent = game.mode === 'endless' ? 'TIME LEFT' : 'TIME';
+    this.el['hud-time'].classList.remove('urgent');
     this.updateShield(false);
     this.combo(0);
     this.el.toasts.innerHTML = '';
@@ -106,7 +107,10 @@ const UI = {
     }
     e['hud-distance'].textContent = U.fmtInt(p.d);
     e['hud-score'].textContent = U.fmtInt(game.score);
-    e['hud-time'].textContent = U.fmtTime(game.elapsed);
+    const left = game.timeLeft;
+    e['hud-time'].textContent = U.fmtTime(left !== null ? left : game.elapsed);
+    e['hud-time'].classList.toggle('urgent', left !== null && left < 10);
+    e['hud-crashes'].textContent = game.crashes;
     const kmh = U.kmh(p.speed);
     e['hud-speed'].textContent = kmh;
     const frac = U.clamp(kmh / 400, 0, 1);
@@ -141,19 +145,6 @@ const UI = {
     }
     game.rivals.forEach((r, i) => (this._chips[i].style.left = `${U.clamp(r.d / CONFIG.RACE.length, 0, 1) * 100}%`));
     this._meChip.style.left = `${U.clamp(game.player.d / CONFIG.RACE.length, 0, 1) * 100}%`;
-  },
-
-  updateLives(n) {
-    const total = CONFIG.PLAYER.lives;
-    const el = this.el['hud-lives'];
-    const prev = this._lives ?? n;
-    el.innerHTML = Array.from({ length: total }, (_, i) => `<i class="${i < n ? '' : 'off'}"></i>`).join('');
-    if (n !== prev) {
-      el.classList.remove('lost', 'gained');
-      void el.offsetWidth;
-      el.classList.add(n < prev ? 'lost' : 'gained');
-    }
-    this._lives = n;
   },
 
   updateShield(on) {
@@ -244,11 +235,10 @@ const UI = {
   showResults(game, res, rankInfo, prevBest = null) {
     if (game.state !== 'finished') return; // player already restarted or quit while results were pending
     const e = this.el;
-    const dnf = res.wrecked && res.mode === 'race';
     const level = CONFIG.DIFFICULTY_LEVELS[res.difficulty];
     e['results-kicker'].textContent = level && res.difficulty !== 'normal' ? `${res.kicker} · ${level.label.toUpperCase()}` : res.kicker;
-    e['results-position'].textContent = dnf ? 'DNF' : `P${res.position}`;
-    e['results-position'].className = 'results-position ' + (dnf ? 'dnf' : res.position === 1 ? 'gold' : res.position <= 3 ? 'silver' : '');
+    e['results-position'].textContent = `P${res.position}`;
+    e['results-position'].className = 'results-position ' + (res.position === 1 ? 'gold' : res.position <= 3 ? 'silver' : '');
     e['results-title'].textContent = res.title;
     e['res-score'].textContent = U.fmtInt(res.score);
     e['res-distance'].textContent = `${U.fmtInt(res.distance)} m`;
@@ -256,6 +246,7 @@ const UI = {
     e['res-topspeed'].textContent = `${res.topSpeed} km/h`;
     e['res-coins'].textContent = res.coins;
     e['res-overtakes'].textContent = res.overtakes;
+    e['res-crashes'].textContent = res.crashes ?? 0;
     if (rankInfo && rankInfo.rank) {
       e['results-rank'].innerHTML = rankInfo.rank === 1 ? `🏆 <b>New #1 on the ${res.mode} board</b>` : `Ranked <b>#${rankInfo.rank}</b> on the ${res.mode} board`;
     } else {
@@ -272,7 +263,7 @@ const UI = {
     e['results-standings'].innerHTML = rows.map((r, i) => this._standingRow(r, i, r.finish !== null ? U.fmtTime(r.finish) : `${U.fmtInt(r.d)} m`)).join('');
     // sector splits (race mode); the final sector is whatever remains of the total time
     const splits = game.player.sectorTimes.slice();
-    if (res.mode === 'race' && !dnf) splits.push(res.time - splits.reduce((a, b) => a + b, 0));
+    if (res.mode === 'race') splits.push(res.time - splits.reduce((a, b) => a + b, 0));
     e['results-sectors'].classList.toggle('hidden', splits.length < 2);
     const best = Math.min(...splits);
     e['results-sectors'].innerHTML = splits.map((s, i) => `<div class="sector ${s === best ? 'best' : ''}"><span>S${i + 1}</span><b>${U.fmtTime(s)}</b></div>`).join('');
@@ -285,7 +276,7 @@ const UI = {
     this.el['lb-empty'].classList.toggle('hidden', list.length > 0);
     body.innerHTML = list
       .map((r, i) => {
-        const detail = r.mode === 'race' ? `${r.wrecked ? 'DNF' : 'P' + r.position} · ${U.fmtTime(r.time)}` : `${U.fmtInt(r.distance)} m · ${U.fmtTime(r.time)}`;
+        const detail = r.mode === 'race' ? `P${r.position} · ${U.fmtTime(r.time)}` : `${U.fmtInt(r.distance)} m · P${r.position}`;
         const diff = r.difficulty && r.difficulty !== 'normal' ? `<i class="diff ${r.difficulty}">${r.difficulty}</i>` : '';
         return `<tr class="${i < 3 ? 'top' : ''}"><td>${i + 1}</td><td>${U.escapeHTML(r.name)}${diff}</td><td>${U.fmtInt(r.score)}</td><td>${detail}</td></tr>`;
       })
