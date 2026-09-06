@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0d1a" />
+  <title>Neon Rush — Modern Arcade Racer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='%2300e5ff'/%3E%3Cstop offset='1' stop-color='%23ff3cac'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%230b0d1a'/%3E%3Cpath d='M14 44 L26 18 H38 L50 44 Z' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game"></canvas>
+
+    <!-- ============ HUD ============ -->
+    <section id="hud" class="screen hud hidden" aria-live="polite">
+      <div class="hud-top">
+        <div class="hud-card position-card">
+          <div class="pos-num" id="hud-position">1<sup>st</sup></div>
+          <div class="pos-label">of <span id="hud-racers">6</span></div>
+        </div>
+        <div class="hud-card center-card">
+          <div class="hud-stat">
+            <span class="hud-label">DISTANCE</span>
+            <span class="hud-value"><span id="hud-distance">0</span><small> m</small></span>
+          </div>
+          <div class="race-progress" id="race-progress-wrap">
+            <div class="race-progress-bar" id="race-progress"></div>
+            <div class="race-progress-flag">🏁</div>
+          </div>
+          <div class="hud-stat">
+            <span class="hud-label">SCORE</span>
+            <span class="hud-value" id="hud-score">0</span>
+          </div>
+        </div>
+        <div class="hud-card lives-card">
+          <div class="hud-label">TIME</div>
+          <div class="hud-value" id="hud-time">0:00.0</div>
+          <div class="lives" id="hud-lives"></div>
+        </div>
+      </div>
+
+      <div class="hud-side">
+        <div class="standings" id="hud-standings"></div>
+      </div>
+
+      <div class="hud-bottom">
+        <div class="speedo">
+          <svg viewBox="0 0 120 80" class="speedo-svg">
+            <path class="speedo-track" d="M10 70 A50 50 0 0 1 110 70" />
+            <path class="speedo-fill" id="speedo-fill" d="M10 70 A50 50 0 0 1 110 70" />
+          </svg>
+          <div class="speedo-value"><span id="hud-speed">0</span><small>km/h</small></div>
+        </div>
+        <div class="boost-panel">
+          <div class="boost-label"><span>NITRO</span><span id="hud-shield" class="shield-tag hidden">🛡 SHIELD</span></div>
+          <div class="boost-bar"><div class="boost-fill" id="hud-nitro"></div></div>
+          <div class="coins-row">🪙 <span id="hud-coins">0</span></div>
+        </div>
+      </div>
+
+      <div class="toasts" id="toasts"></div>
+      <div class="combo" id="hud-combo"></div>
+
+      <div class="touch-controls" id="touch-controls">
+        <button class="touch-btn steer" id="touch-left" aria-label="Steer left">◀</button>
+        <div class="touch-mid">
+          <button class="touch-btn action brake" id="touch-brake" aria-label="Brake">BRAKE</button>
+          <button class="touch-btn action nitro" id="touch-nitro" aria-label="Nitro">NITRO</button>
+        </div>
+        <button class="touch-btn steer" id="touch-right" aria-label="Steer right">▶</button>
+      </div>
+      <button class="icon-btn pause-btn" id="btn-pause" aria-label="Pause">❚❚</button>
+    </section>
+
+    <div id="countdown" class="countdown hidden"></div>
+
+    <!-- ============ MAIN MENU ============ -->
+    <section id="menu" class="screen overlay">
+      <div class="panel menu-panel">
+        <header class="brand">
+          <div class="brand-tag">STREAM-READY ARCADE RACER</div>
+          <h1 class="brand-title"><span>NEON</span> RUSH</h1>
+          <p class="brand-sub">Outrun the rivals. Dodge everything. Own the leaderboard.</p>
+        </header>
+
+        <div class="menu-grid">
+          <label class="field">
+            <span>Driver name</span>
+            <input id="input-name" type="text" maxlength="14" placeholder="Enter your tag" autocomplete="off" />
+          </label>
+
+          <div class="field">
+            <span>Mode</span>
+            <div class="segmented" id="mode-select">
+              <button class="seg active" data-mode="race">🏁 Race <small>3 km sprint vs 5 rivals</small></button>
+              <button class="seg" data-mode="endless">♾ Endless <small>Survive &amp; score</small></button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span>Paint</span>
+            <div class="swatches" id="color-select"></div>
+          </div>
+        </div>
+
+        <div class="menu-actions">
+          <button class="btn primary big" id="btn-play">▶ START ENGINE</button>
+          <div class="btn-row">
+            <button class="btn ghost" id="btn-leaderboard">🏆 Leaderboard</button>
+            <button class="btn ghost" id="btn-howto">❔ How to play</button>
+            <button class="btn ghost icon" id="btn-sound" aria-label="Toggle sound">🔊</button>
+          </div>
+        </div>
+
+        <footer class="menu-foot">
+          <span class="pill">Best: <b id="menu-best">—</b></span>
+          <span class="pill yt">▶ YouTube integration: <b>coming next</b></span>
+        </footer>
+      </div>
+    </section>
+
+    <!-- ============ HOW TO PLAY ============ -->
+    <section id="howto" class="screen overlay hidden">
+      <div class="panel small-panel">
+        <h2>How to play</h2>
+        <ul class="howto-list">
+          <li><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd> — steer</li>
+          <li><kbd>↓</kbd> / <kbd>S</kbd> — brake</li>
+          <li><kbd>Shift</kbd> / <kbd>Space</kbd> — nitro (hold)</li>
+          <li><kbd>P</kbd> / <kbd>Esc</kbd> — pause &nbsp;·&nbsp; <kbd>M</kbd> — mute</li>
+          <li>📱 On touch: hold the side buttons to steer.</li>
+        </ul>
+        <div class="legend">
+          <div><i class="dot cone"></i> Cones &amp; barriers cost a life</div>
+          <div><i class="dot oil"></i> Oil makes you slide</div>
+          <div><i class="dot coin"></i> Coins = score</div>
+          <div><i class="dot nitro"></i> Canisters refill nitro</div>
+          <div><i class="dot shield"></i> Shield absorbs one hit</div>
+          <div><i class="dot rival"></i> Overtake rivals for bonus</div>
+        </div>
+        <button class="btn primary" id="btn-howto-back">Got it</button>
+      </div>
+    </section>
+
+    <!-- ============ LEADERBOARD ============ -->
+    <section id="leaderboard" class="screen overlay hidden">
+      <div class="panel small-panel">
+        <h2>🏆 Leaderboard</h2>
+        <div class="segmented compact" id="lb-tabs">
+          <button class="seg active" data-mode="race">Race</button>
+          <button class="seg" data-mode="endless">Endless</button>
+        </div>
+        <div class="lb-table-wrap">
+          <table class="lb-table">
+            <thead><tr><th>#</th><th>Driver</th><th>Score</th><th>Detail</th></tr></thead>
+            <tbody id="lb-body"></tbody>
+          </table>
+          <div class="lb-empty hidden" id="lb-empty">No runs yet. Be the first on the board!</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" id="btn-lb-back">Back</button>
+          <button class="btn ghost danger" id="btn-lb-clear">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PAUSE ============ -->
+    <section id="pause" class="screen overlay hidden">
+      <div class="panel small-panel">
+        <h2>Paused</h2>
+        <div class="btn-col">
+          <button class="btn primary" id="btn-resume">Resume</button>
+          <button class="btn ghost" id="btn-restart">Restart</button>
+          <button class="btn ghost" id="btn-quit">Quit to menu</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RESULTS ============ -->
+    <section id="results" class="screen overlay hidden">
+      <div class="panel results-panel">
+        <div class="results-head">
+          <div class="results-kicker" id="results-kicker">RACE COMPLETE</div>
+          <div class="results-position" id="results-position">1<sup>st</sup></div>
+          <div class="results-title" id="results-title">Champion!</div>
+        </div>
+        <div class="results-grid">
+          <div class="stat"><span>Score</span><b id="res-score">0</b></div>
+          <div class="stat"><span>Distance</span><b id="res-distance">0 m</b></div>
+          <div class="stat"><span>Time</span><b id="res-time">0:00.0</b></div>
+          <div class="stat"><span>Top speed</span><b id="res-topspeed">0 km/h</b></div>
+          <div class="stat"><span>Coins</span><b id="res-coins">0</b></div>
+          <div class="stat"><span>Overtakes</span><b id="res-overtakes">0</b></div>
+        </div>
+        <div class="results-rank" id="results-rank"></div>
+        <div class="results-standings" id="results-standings"></div>
+        <div class="btn-row">
+          <button class="btn primary" id="btn-retry">↻ Race again</button>
+          <button class="btn ghost" id="btn-results-lb">🏆 Leaderboard</button>
+          <button class="btn ghost" id="btn-results-menu">Menu</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Classic scripts, load order matters (shared global lexical scope). -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/leaderboard.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
