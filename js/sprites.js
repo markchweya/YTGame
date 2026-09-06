@@ -17,13 +17,13 @@ const Sprites = {
     for (const c of ['#ffd9a0', '#ff2040', '#ffd166', '#39c6ff', '#8ea6ff', '#5ee07a', '#ffcc33', '#ffffff']) this.glow(c, 96);
   },
 
-  car(color, style = 'sport') {
-    const key = `car:${style}:${color}`;
+  car(color, style = 'sport', stripe = null) {
+    const key = `car:${style}:${color}:${stripe || ''}`;
     if (this._cache.has(key)) return this._cache.get(key);
     const c = document.createElement('canvas');
     c.width = this.CAR_W;
     c.height = this.CAR_H;
-    this._drawCar(c.getContext('2d'), color, CONFIG.CARS[style] || CONFIG.CARS.sport);
+    this._drawCar(c.getContext('2d'), color, CONFIG.CARS[style] || CONFIG.CARS.sport, stripe);
     this._cache.set(key, c);
     return c;
   },
@@ -131,7 +131,7 @@ const Sprites = {
   },
 
   /* Rear three-quarter-ish view of a sports car, centred at x=128, tyres on GROUND. */
-  _drawCar(ctx, color, S) {
+  _drawCar(ctx, color, S, stripe) {
     const W = this.CAR_W;
     const cx = W / 2;
     const G = this.GROUND;
@@ -238,6 +238,15 @@ const Sprites = {
     ctx.fillStyle = mid;
     rrect(ctx, cx - roofW / 2 + 14, roofY - 20, roofW - 28, 10, 4);
     ctx.fill();
+
+    // optional twin racing stripe over hood, roof and rear deck
+    if (stripe) {
+      ctx.fillStyle = U.rgba(stripe, 0.85);
+      for (const off of [-14, 6]) {
+        ctx.fillRect(cx + off, roofY - 20, 8, glassTop - roofY + 22);
+        ctx.fillRect(cx + off, glassBot + 2, 8, shoulderY + 12 - glassBot);
+      }
+    }
 
     // pillars / cabin edges
     ctx.strokeStyle = 'rgba(0,0,0,0.55)';
