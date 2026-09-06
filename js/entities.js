@@ -59,7 +59,9 @@ const OBSTACLE_TYPES = {
   barrier: { halfWidth: 0.2, length: 1.6, damage: true, weight: 3 },
   rock: { halfWidth: 0.1, length: 2.2, damage: true, weight: 2 },
   oil: { halfWidth: 0.16, length: 3.5, damage: false, weight: 3 },
+  puddle: { halfWidth: 0.18, length: 4, damage: false, weight: 2 }, // harmless splash, small speed loss
   car: { halfWidth: 0.16, length: 4.6, damage: true, weight: 0 }, // spawned separately
+  truck: { halfWidth: 0.2, length: 9, damage: true, weight: 0 }, // spawned separately, slow and wide
 };
 
 class Obstacle {
@@ -74,7 +76,7 @@ class Obstacle {
     this.damage = t.damage;
     this.hit = false;
     this.speed = 0;
-    this.color = type === 'car' ? U.pick(['#8d99ae', '#4a4e69', '#c9ada7', '#22577a', '#3d5a80', '#e07a5f', '#f1f1f1']) : null;
+    this.color = type === 'car' ? U.pick(['#8d99ae', '#4a4e69', '#c9ada7', '#22577a', '#3d5a80', '#e07a5f', '#f1f1f1']) : type === 'truck' ? U.pick(['#d9d9d9', '#b23a48', '#2f6f9f', '#f2b134']) : null;
     this.style = type === 'car' ? U.pick(Object.keys(CONFIG.CARS)) : null;
     this.seed = Math.random();
   }
