@@ -200,6 +200,31 @@
     UI.refreshBest();
   });
 
+  /* ---- leaderboard backup ---- */
+  $('btn-lb-export').addEventListener('click', () => {
+    const blob = new Blob([Leaderboard.exportJSON()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `neon-rush-leaderboard-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  $('btn-lb-import').addEventListener('click', () => $('lb-file').click());
+  $('lb-file').addEventListener('change', async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      Leaderboard.importJSON(await file.text());
+      UI.renderLeaderboard(lbMode);
+      UI.refreshBest();
+    } catch (err) {
+      alert(`Import failed: ${err.message}`);
+    }
+    e.target.value = '';
+  });
+
   soundBtn.addEventListener('click', () => {
     audio.unlock();
     audio.toggleMute();
