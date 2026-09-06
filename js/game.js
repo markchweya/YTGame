@@ -493,6 +493,7 @@ class Game {
           this.ui.toast(`Close call! +${S.closeCall}`, 'good');
           this.spawnText('+' + S.closeCall, '#7cff6b');
           this.audio.closeCall();
+          if ((o.type === 'car' || o.type === 'truck') && U.chance(CONFIG.OBSTACLES.hornChance)) this.audio.horn();
         }
       }
     }
@@ -509,6 +510,8 @@ class Game {
     const p = this.player;
     const P = CONFIG.PLAYER;
     o.hit = true;
+    o.hitAt = this.time;
+    o.hitDir = o.x > p.x ? 1 : -1;
     if (o.type === 'puddle') {
       p.speed *= CONFIG.OBSTACLES.puddleSpeedMult;
       for (let i = 0; i < 14; i++) this.spawnDust('rgba(150,180,220,0.7)', true);
