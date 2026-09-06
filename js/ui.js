@@ -281,7 +281,8 @@ const UI = {
     body.innerHTML = list
       .map((r, i) => {
         const detail = r.mode === 'race' ? `${r.wrecked ? 'DNF' : 'P' + r.position} · ${U.fmtTime(r.time)}` : `${U.fmtInt(r.distance)} m · ${U.fmtTime(r.time)}`;
-        return `<tr class="${i < 3 ? 'top' : ''}"><td>${i + 1}</td><td>${U.escapeHTML(r.name)}</td><td>${U.fmtInt(r.score)}</td><td>${detail}</td></tr>`;
+        const diff = r.difficulty && r.difficulty !== 'normal' ? `<i class="diff ${r.difficulty}">${r.difficulty}</i>` : '';
+        return `<tr class="${i < 3 ? 'top' : ''}"><td>${i + 1}</td><td>${U.escapeHTML(r.name)}${diff}</td><td>${U.fmtInt(r.score)}</td><td>${detail}</td></tr>`;
       })
       .join('');
     document.querySelectorAll('#lb-tabs .tab').forEach((b) => b.classList.toggle('active', b.dataset.mode === mode));
