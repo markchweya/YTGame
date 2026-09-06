@@ -205,6 +205,14 @@ class AudioEngine {
   click() {
     this._blip({ type: 'sine', from: 700, to: 500, dur: 0.06, vol: 0.08 });
   }
+  /* quick engine dip on a gear change */
+  gearShift() {
+    if (!this.engine) return;
+    const t = this.ctx.currentTime;
+    const g = this.engine.g.gain;
+    g.setTargetAtTime(0.04, t, 0.02);
+    g.setTargetAtTime(0.11, t + 0.09, 0.05);
+  }
   /* short rising chime for a sector split */
   sector() {
     this._blip({ type: 'triangle', from: 740, to: 740, dur: 0.1, vol: 0.14 });
