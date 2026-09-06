@@ -277,6 +277,9 @@
     else if (game.state === 'paused') game.resume();
   };
   input.onPause = togglePause;
+  input.onRestart = () => {
+    if (['paused', 'finished'].includes(game.state)) game.restart();
+  };
   $('btn-pause').addEventListener('click', togglePause);
   $('btn-resume').addEventListener('click', () => game.resume());
   $('btn-restart').addEventListener('click', () => game.restart());
