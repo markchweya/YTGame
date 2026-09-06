@@ -71,6 +71,7 @@ class AudioEngine {
     osc2.stop(t + 0.6);
     this.engine = null;
     this.setRumble(0);
+    if (this.wind) this.wind.g.gain.setTargetAtTime(0, t, 0.2);
   }
 
   /* Looping filtered noise for gravel/grass; level 0..1 */
@@ -104,6 +105,30 @@ class AudioEngine {
   updateEngine(speed01, nitro) {
     if (!this.engine) return;
     const t = this.ctx.currentTime;
+    // wind noise rises with speed
+    if (!this.wind) {
+      const ctx = this.ctx;
+      const len = ctx.sampleRate * 2;
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+      const f = ctx.createBiquadFilter();
+      f.type = 'bandpass';
+      f.frequency.value = 900;
+      f.Q.value = 0.6;
+      const g = ctx.createGain();
+      g.gain.value = 0;
+      src.connect(f);
+      f.connect(g);
+      g.connect(this.master);
+      src.start();
+      this.wind = { src, f, g };
+    }
+    this.wind.g.gain.setTargetAtTime(0.09 * speed01 * speed01, t, 0.15);
+    this.wind.f.frequency.setTargetAtTime(600 + speed01 * 1400, t, 0.2);
     const f = 55 + speed01 * 150 + (nitro ? 40 : 0);
     this.engine.osc.frequency.setTargetAtTime(f, t, 0.08);
     this.engine.osc2.frequency.setTargetAtTime(f * 0.5, t, 0.08);
