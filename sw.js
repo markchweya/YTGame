@@ -1,7 +1,7 @@
 /* Service worker: caches the game shell so it runs offline after the first visit.
  * Bump CACHE when files change so old shells are dropped.
  */
-const CACHE = 'neon-rush-v1';
+const CACHE = 'neon-rush-v2';
 const SHELL = [
   './',
   './index.html',
