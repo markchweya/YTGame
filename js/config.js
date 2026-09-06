@@ -20,6 +20,7 @@ const CONFIG = {
     shoulder: 1.22,         // lateral extent of the gravel shoulder
     rail: 1.32,             // guardrail position
     edgeLine: 0.965,        // white edge line centre
+    wearAlpha: 0.12,        // darkness of tyre-wear tracks in each lane (0 disables)
   },
 
   PLAYER: {
