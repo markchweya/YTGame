@@ -111,6 +111,16 @@ class Pickup {
   }
 }
 
+/* World-space skid mark left on the asphalt (drawn as a dark strip). */
+class Skid {
+  constructor(d, x, length, alpha = 0.5) {
+    this.d = d;
+    this.x = x;
+    this.length = length;
+    this.alpha = alpha;
+  }
+}
+
 /* Screen-space particle. */
 class Particle {
   constructor(x, y, vx, vy, life, color, size, opts = {}) {
