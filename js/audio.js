@@ -18,7 +18,7 @@ class AudioEngine {
       if (!AC) return;
       this.ctx = new AC();
       this.master = this.ctx.createGain();
-      this.master.gain.value = this.muted ? 0 : 0.6;
+      this.master.gain.value = this.muted ? 0 : this.volume;
       this.master.connect(this.ctx.destination);
       this._unlocked = true;
     } catch (_) {
@@ -30,10 +30,17 @@ class AudioEngine {
     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
   }
 
+  get volume() {
+    return this._volume ?? 0.6;
+  }
+  setVolume(v) {
+    this._volume = U.clamp(v, 0, 1);
+    if (this.master && !this.muted) this.master.gain.setTargetAtTime(this._volume, this.ctx.currentTime, 0.05);
+  }
   setMuted(m) {
     this.muted = m;
     Storage.set('muted', m);
-    if (this.master) this.master.gain.setTargetAtTime(m ? 0 : 0.6, this.ctx.currentTime, 0.05);
+    if (this.master) this.master.gain.setTargetAtTime(m ? 0 : this.volume, this.ctx.currentTime, 0.05);
   }
   toggleMute() {
     this.setMuted(!this.muted);
