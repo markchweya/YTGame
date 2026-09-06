@@ -236,7 +236,15 @@ class AudioEngine {
     this._blip({ type: 'sine', from: 1200, to: 1800, dur: 0.1, vol: 0.1 });
   }
   countdown(final) {
-    this._blip({ type: 'square', from: final ? 880 : 440, to: final ? 880 : 440, dur: final ? 0.5 : 0.15, vol: 0.15 });
+    // each red light steps up a semitone pair; green holds a long high tone
+    if (final) {
+      this._blip({ type: 'square', from: 880, to: 880, dur: 0.55, vol: 0.16 });
+      this._blip({ type: 'triangle', from: 1320, to: 1320, dur: 0.4, vol: 0.08, delay: 0.05 });
+      return;
+    }
+    this._step = ((this._step || 0) % 3) + 1;
+    const f = 392 * Math.pow(1.122, this._step);
+    this._blip({ type: 'square', from: f, to: f, dur: 0.15, vol: 0.15 });
   }
   finish() {
     [523, 659, 784, 1046].forEach((f, i) => this._blip({ type: 'triangle', from: f, to: f, dur: 0.3, vol: 0.2, delay: i * 0.12 }));
