@@ -97,7 +97,9 @@ class Game {
     this._last = now;
     this.time += dt;
     if (this.state !== 'paused') this.update(dt);
+    if (this.shakeEnabled === false) this.shake = 0;
     this.renderer.render(this);
+    this.ui.tickFps(dt);
     requestAnimationFrame((t) => this.loop(t));
   }
 
