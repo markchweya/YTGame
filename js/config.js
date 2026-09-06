@@ -1,46 +1,64 @@
 /* global namespace: CONFIG
  * All tunables for Neon Rush live here. Units: metres, seconds, m/s.
+ * Lateral positions: -1..1 spans the asphalt; beyond that is shoulder/grass.
  */
 const CONFIG = {
   GAME_NAME: 'Neon Rush',
-  STORAGE_KEY: 'neonrush.v1',
+  STORAGE_KEY: 'neonrush.v2',
 
   LANES: 4,
 
   ROAD: {
-    horizon: 0.38,          // fraction of canvas height where the horizon sits
-    nearHalfWidth: 0.38,    // road half-width at the bottom as fraction of canvas width
-    zNear: 1,               // camera-space depth at the player's car
-    zFar: 16,               // camera-space depth at the horizon cut-off
-    viewRange: 260,         // metres of road visible ahead
-    stripeLen: 12,          // metres per grass stripe
-    dashPeriod: 10,         // metres per lane-dash cycle
+    horizon: 0.42,          // fraction of canvas height where the horizon sits
+    nearHalfWidth: 0.36,    // asphalt half-width at the bottom as fraction of canvas width
+    zNear: 1,
+    zFar: 18,
+    viewRange: 320,         // metres of road visible ahead
+    dashPeriod: 12,         // metres per lane-dash cycle
     dashLen: 5,
+    textureLen: 22,         // metres of road covered by one texture tile
+    shoulder: 1.22,         // lateral extent of the gravel shoulder
+    rail: 1.32,             // guardrail position
+    edgeLine: 0.965,        // white edge line centre
   },
 
   PLAYER: {
     baseSpeed: 42,          // m/s (~150 km/h) cruising speed at the start
-    maxSpeed: 78,           // m/s (~280 km/h) hard ceiling without nitro
-    accel: 14,              // m/s² auto acceleration
+    maxSpeed: 80,           // m/s (~290 km/h) hard ceiling without nitro
+    accel: 14,
     brakeDecel: 55,
-    steerSpeed: 2.4,        // lateral units/second (road half-width = 1)
+    steerSpeed: 2.4,        // lateral units/second
     steerSmoothing: 10,
-    carHalfWidth: 0.16,     // lateral units
-    carLength: 4.6,         // metres
+    carHalfWidth: 0.15,
+    carLength: 4.6,
     lives: 3,
     invulnTime: 1.6,
     crashSpeedMult: 0.35,
     nitroMult: 1.5,
-    nitroDrain: 0.28,       // fraction of bar per second
+    nitroDrain: 0.28,
     nitroPickup: 0.45,
     nitroStart: 0.35,
     oilSlideTime: 1.4,
+    railBounce: 0.6,        // speed kept after hitting the guardrail
+  },
+
+  OFFROAD: {
+    shoulderSpeedMult: 0.78, // target speed fraction while on gravel
+    grassSpeedMult: 0.55,
+    drag: 1.6,              // how quickly speed decays toward the off-road target
+    shake: 0.25,
+  },
+
+  /* Body styles selectable in the garage. Multipliers apply on top of PLAYER. */
+  CARS: {
+    sport: { name: 'Viper GT', width: 1.0, height: 1.0, roof: 0.62, spoiler: 'wing', lights: 'bar', exhaust: 'side', speed: 1.0, handling: 1.0, nitro: 1.0, blurb: 'Balanced all-rounder' },
+    muscle: { name: 'Brawler V8', width: 1.08, height: 1.05, roof: 0.7, spoiler: 'duck', lights: 'quad', exhaust: 'side', speed: 1.06, handling: 0.86, nitro: 0.95, blurb: 'Raw top speed, heavy steering' },
+    hyper: { name: 'Phantom X', width: 1.04, height: 0.9, roof: 0.56, spoiler: 'lip', lights: 'bar', exhaust: 'center', speed: 1.02, handling: 1.1, nitro: 1.15, blurb: 'Razor handling, bigger nitro' },
   },
 
   DIFFICULTY: {
-    // cruising speed grows with distance travelled: base + rampPerKm * km, capped by maxSpeed
     rampPerKm: 7,
-    spawnGapStart: 62,      // metres between obstacle groups at start
+    spawnGapStart: 62,
     spawnGapMin: 26,
     spawnGapRampPerKm: 9,
     pickupChance: 0.42,
@@ -50,20 +68,20 @@ const CONFIG = {
   RIVALS: {
     count: 5,
     names: ['Blaze', 'Kira', 'Zed', 'Nova', 'Ryu', 'Vex', 'Mika', 'Onyx', 'Juno', 'Rex'],
-    colors: ['#ff5e5e', '#ffb347', '#7cff6b', '#f0f', '#ffe14d', '#66e0ff'],
-    speedBias: [-0.12, 0.05], // per-rival speed offset vs the player's "cruise" speed
+    colors: ['#e63946', '#f4a261', '#2a9d8f', '#e0e0e6', '#ffd166', '#8338ec'],
+    speedBias: [-0.12, 0.05],
     accel: 14,
-    gridGap: 9,             // metres between rivals on the starting grid (they start ahead of you)
-    rubberBandRange: 140,   // metres before rubber-banding kicks in
+    gridGap: 9,
+    rubberBandRange: 140,
     rubberBandStrength: 0.14,
     laneChangeInterval: [2.5, 6],
     carLength: 4.6,
-    carHalfWidth: 0.16,
+    carHalfWidth: 0.15,
     bumpSpeedMult: 0.7,
   },
 
   RACE: {
-    length: 3000,           // metres
+    length: 3000,
     positionScores: [1000, 700, 500, 350, 250, 150],
   },
 
@@ -73,23 +91,18 @@ const CONFIG = {
     overtake: 25,
     closeCall: 15,
     crashPenalty: 50,
-    timeBonusRace: 4,       // points per second under the par time
+    timeBonusRace: 4,
     raceParTime: 75,
   },
 
   PALETTE: {
-    playerColors: ['#00e5ff', '#ff3cac', '#7cff6b', '#ffb347', '#b388ff', '#ffffff'],
-    sky: ['#0a0b1e', '#1a1040', '#3b1d5e', '#ff5a8f'],
-    grassA: '#0c1a2a', grassB: '#0f2030',
-    roadA: '#1c1f2b', roadB: '#1a1d29',
-    rumbleA: '#ff2f7a', rumbleB: '#f5f7ff',
-    lane: 'rgba(255,255,255,0.55)',
-    edgeGlow: '#00e5ff',
+    playerColors: ['#d81b3a', '#0fa3b1', '#f2f2f2', '#1b1f2a', '#f9a825', '#6a4c93'],
+    sky: ['#0b1a33', '#1e3a66', '#5b6ea3', '#e58c6b', '#f7c07a'],
+    lane: 'rgba(245,245,240,0.92)',
+    edge: 'rgba(250,250,245,0.95)',
   },
 
   YOUTUBE: {
-    // Wired later: when enabled, the leaderboard provider will sync runs to a backend
-    // and live-chat viewers can join as rivals. Keep keys OUT of this file.
     enabled: false,
     apiBase: '',
   },

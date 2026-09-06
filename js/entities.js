@@ -4,9 +4,12 @@
  */
 
 class Player {
-  constructor(color) {
+  constructor(color, style = 'sport') {
     const P = CONFIG.PLAYER;
     this.color = color;
+    this.style = CONFIG.CARS[style] ? style : 'sport';
+    this.stats = CONFIG.CARS[this.style];
+    this.offroad = 0; // 0 road, 1 shoulder, 2 grass
     this.x = 0;
     this.targetX = 0;
     this.vx = 0;
@@ -34,6 +37,7 @@ class Rival {
     this.id = i;
     this.name = name;
     this.color = color;
+    this.style = U.pick(Object.keys(CONFIG.CARS));
     this.lane = i % CONFIG.LANES;
     this.x = U.laneX(this.lane, CONFIG.LANES);
     this.targetX = this.x;
@@ -70,7 +74,8 @@ class Obstacle {
     this.damage = t.damage;
     this.hit = false;
     this.speed = 0;
-    this.color = type === 'car' ? U.pick(['#8d99ae', '#4a4e69', '#c9ada7', '#22577a', '#7b2cbf', '#e07a5f']) : null;
+    this.color = type === 'car' ? U.pick(['#8d99ae', '#4a4e69', '#c9ada7', '#22577a', '#3d5a80', '#e07a5f', '#f1f1f1']) : null;
+    this.style = type === 'car' ? U.pick(Object.keys(CONFIG.CARS)) : null;
     this.seed = Math.random();
   }
 }
@@ -110,6 +115,7 @@ class Particle {
     this.drag = opts.drag ?? 1;
     this.shape = opts.shape || 'circle';
     this.text = opts.text || null;
+    this.alpha = opts.alpha ?? 1;
   }
   update(dt) {
     this.life -= dt;

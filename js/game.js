@@ -9,7 +9,11 @@ class Game {
     this.mode = 'race';
     this.playerName = 'Driver';
     this.playerColor = CONFIG.PALETTE.playerColors[0];
+    this.playerStyle = 'sport';
     this.onFinished = null;
+    this.hill = 0;
+    this.hillTarget = 0;
+    this.hillTimer = 4;
     this.reset(true);
     this._last = performance.now();
     this._standingsTimer = 0;
@@ -19,7 +23,7 @@ class Game {
   /* ---------- lifecycle ---------- */
   reset(demo) {
     this.demo = demo;
-    this.player = new Player(this.playerColor);
+    this.player = new Player(this.playerColor, this.playerStyle);
     const names = CONFIG.RIVALS.names.slice().sort(() => Math.random() - 0.5);
     this.rivals = Array.from({ length: CONFIG.RIVALS.count }, (_, i) => new Rival(i, names[i], CONFIG.RIVALS.colors[i % CONFIG.RIVALS.colors.length]));
     this.obstacles = [];
@@ -52,10 +56,11 @@ class Game {
     }
   }
 
-  start(mode, name, color) {
+  start(mode, name, color, style) {
     this.mode = mode;
     this.playerName = name;
     this.playerColor = color;
+    this.playerStyle = style || this.playerStyle;
     this.reset(false);
     this.state = 'countdown';
     this.countdown = 3.4;
@@ -65,7 +70,7 @@ class Game {
   }
 
   restart() {
-    this.start(this.mode, this.playerName, this.playerColor);
+    this.start(this.mode, this.playerName, this.playerColor, this.playerStyle);
   }
 
   pause() {
@@ -141,6 +146,12 @@ class Game {
       this.curveTimer = U.rand(4, 9);
     }
     this.curve = U.damp(this.curve, this.curveTarget, 0.45, dt);
+    this.hillTimer -= dt;
+    if (this.hillTimer <= 0) {
+      this.hillTarget = U.chance(0.4) ? 0 : U.rand(-0.35, 0.45);
+      this.hillTimer = U.rand(5, 11);
+    }
+    this.hill = U.damp(this.hill, this.hillTarget, 0.35, dt);
   }
 
   updateDemo(dt) {
@@ -190,48 +201,74 @@ class Game {
     const p = this.player;
     const km = p.d / 1000;
 
-    p.cruise = Math.min(P.maxSpeed, P.baseSpeed + D.rampPerKm * km);
+    const st = p.stats;
+    p.cruise = Math.min(P.maxSpeed * st.speed, (P.baseSpeed + D.rampPerKm * km) * st.speed);
     p.nitroActive = this.input.nitro && p.nitro > 0.01;
     if (p.nitroActive) {
       if (!p._nitroWas) this.audio.nitro();
-      p.nitro = Math.max(0, p.nitro - P.nitroDrain * dt);
+      p.nitro = Math.max(0, p.nitro - (P.nitroDrain / st.nitro) * dt);
       if (Math.random() < 0.6) this.spawnNitroTrail();
     } else {
       p.nitro = Math.min(1, p.nitro + 0.015 * dt);
     }
     p._nitroWas = p.nitroActive;
 
-    const target = p.cruise * (p.nitroActive ? P.nitroMult : 1);
+    // off-road detection: |x| > 1 is the gravel shoulder, beyond ROAD.shoulder is grass
+    const ax = Math.abs(p.x);
+    const O = CONFIG.OFFROAD;
+    const R = CONFIG.ROAD;
+    const wasOff = p.offroad;
+    p.offroad = ax + p.halfWidth * 0.5 > R.shoulder ? 2 : ax + p.halfWidth * 0.5 > 1 ? 1 : 0;
+    if (p.offroad && !wasOff) this.ui.toast(p.offroad === 2 ? 'Off road!' : 'On the shoulder', 'warn');
+
+    let target = p.cruise * (p.nitroActive ? P.nitroMult : 1);
+    if (p.offroad) target *= p.offroad === 2 ? O.grassSpeedMult : O.shoulderSpeedMult;
     if (this.input.brake) {
       p.speed = Math.max(p.cruise * 0.35, p.speed - P.brakeDecel * dt);
     } else if (p.speed < target) {
       p.speed = Math.min(target, p.speed + P.accel * (p.nitroActive ? 3 : 1) * dt);
     } else {
-      p.speed = U.damp(p.speed, target, 1.2, dt);
+      p.speed = U.damp(p.speed, target, p.offroad ? O.drag : 1.2, dt);
     }
     p.topSpeed = Math.max(p.topSpeed, p.speed);
 
+    if (p.offroad) {
+      this.shake = Math.max(this.shake, O.shake * (p.offroad === 2 ? 1.4 : 1) * U.clamp(p.speed / 40, 0, 1));
+      if (Math.random() < 0.7) this.spawnDust(p.offroad === 2 ? '#6b7a4a' : '#9a8b78');
+    }
+
     // steering
     let steer = (this.input.right ? 1 : 0) - (this.input.left ? 1 : 0);
-    let steerRate = P.steerSpeed * (0.85 + 0.15 * U.clamp(p.speed / P.maxSpeed, 0, 1));
+    let steerRate = P.steerSpeed * st.handling * (0.85 + 0.15 * U.clamp(p.speed / P.maxSpeed, 0, 1));
     if (p.slide > 0) {
       p.slide -= dt;
       steer = steer * 0.35 + Math.sin(this.time * 18) * p.slideDir * 0.9;
       steerRate *= 1.1;
+      if (Math.random() < 0.5) this.spawnDust('rgba(200,200,210,0.6)', true);
     }
+    if (p.offroad === 2) steer += Math.sin(this.time * 23) * 0.25;
     const targetVx = steer * steerRate;
     p.vx = U.damp(p.vx, targetVx, P.steerSmoothing, dt);
     p.x += p.vx * dt;
     // centrifugal drift on curves
     p.x -= this.curve * 0.16 * dt * (p.speed / P.baseSpeed);
-    const lim = 1 - p.halfWidth - 0.01;
+    // guardrail
+    const lim = R.rail - p.halfWidth - 0.02;
     if (p.x > lim || p.x < -lim) {
-      p.x = U.clamp(p.x, -lim, lim);
-      p.vx *= -0.2;
-      p.speed *= 1 - 0.6 * dt;
-      if (Math.random() < 0.5) this.spawnSparks(p.x > 0 ? 1 : -1, 2);
+      const side = p.x > 0 ? 1 : -1;
+      p.x = side * lim;
+      p.vx = -side * Math.abs(p.vx) * 0.5 - side * 0.6;
+      if (p.railCooldown <= 0 || p.railCooldown === undefined) {
+        p.speed *= P.railBounce;
+        p.railCooldown = 0.6;
+        this.shake = Math.max(this.shake, 0.7);
+        this.spawnSparks(side, 18);
+        this.audio.bump();
+        this.ui.toast('Guardrail!', 'bad');
+      }
     }
-    p.tilt = U.damp(p.tilt, p.vx * 0.045 + (p.slide > 0 ? Math.sin(this.time * 18) * 0.06 : 0), 8, dt);
+    p.railCooldown = Math.max(0, (p.railCooldown || 0) - dt);
+    p.tilt = U.damp(p.tilt, p.vx * 0.045 + (p.slide > 0 ? Math.sin(this.time * 18) * 0.06 : 0) + (p.offroad ? Math.sin(this.time * 31) * 0.012 : 0), 8, dt);
 
     p.invuln = Math.max(0, p.invuln - dt);
     p.d += p.speed * dt;
@@ -541,6 +578,7 @@ class Game {
       kicker = 'RACE COMPLETE';
       title = position === 1 ? 'Champion!' : position <= 3 ? 'Podium finish!' : 'Race finished';
       this.audio.finish();
+      if (position <= 3) this.spawnConfetti(160);
     } else {
       kicker = this.mode === 'race' ? 'DID NOT FINISH' : 'GAME OVER';
       title = this.mode === 'race' ? 'Wrecked before the line' : `Survived ${U.fmtInt(p.d)} m`;
@@ -569,8 +607,22 @@ class Game {
 
   /* ---------- particles ---------- */
   playerScreen() {
-    const r = this.renderer;
-    return { x: r.W / 2 + this.player.x * r.nearHalfW, y: r.playerY };
+    return this.renderer.playerScreen(this);
+  }
+  spawnDust(color, smoke = false) {
+    const { x, y } = this.playerScreen();
+    const w = this.renderer.laneW * 0.3;
+    const side = smoke ? (U.chance(0.5) ? -1 : 1) : this.player.x > 0 ? 1 : -1;
+    this.particles.push(
+      new Particle(x + side * w * 0.9 + U.rand(-6, 6), y - 4, U.rand(-40, 40) + side * 30, U.rand(60, 160), U.rand(0.4, 0.9), color, U.rand(8, 16), { shape: 'smoke', drag: 0.97, alpha: 0.55 })
+    );
+  }
+  spawnConfetti(n) {
+    const { W } = this.renderer;
+    const colors = ['#ffd166', '#ef476f', '#06d6a0', '#118ab2', '#f2f2f2', '#8338ec'];
+    for (let i = 0; i < n; i++) {
+      this.particles.push(new Particle(U.rand(0, W), U.rand(-40, -5), U.rand(-60, 60), U.rand(80, 220), U.rand(2.2, 3.6), U.pick(colors), U.rand(4, 8), { shape: 'rect', gravity: 60, drag: 0.995 }));
+    }
   }
   spawnSparks(dir, n, color = '#ffb347') {
     const { x, y } = this.playerScreen();
