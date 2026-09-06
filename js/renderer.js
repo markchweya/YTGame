@@ -315,6 +315,18 @@ class Renderer {
       ctx.drawImage(tex.asphalt, 0, srcY, 256, srcH, Math.min(a.cx - a.hw, b.cx - b.hw) - 1, y0, a.hw * 2 + Math.abs(a.cx - b.cx) + 2, hgt);
       ctx.restore();
 
+      // tyre wear: two darker tracks per lane
+      if (R.wearAlpha > 0) {
+        ctx.fillStyle = `rgba(0,0,0,${R.wearAlpha})`;
+        for (let k = 0; k < lanes; k++) {
+          const lc = -1 + ((k + 0.5) * 2) / lanes;
+          for (const off of [-0.09, 0.09]) {
+            const t = lc + off;
+            quad(ctx, a.cx + (t - 0.035) * a.hw, a.y + 1, a.cx + (t + 0.035) * a.hw, b.cx + (t - 0.035) * b.hw, b.y, b.cx + (t + 0.035) * b.hw);
+          }
+        }
+      }
+
       // edge lines
       ctx.fillStyle = PAL.edge;
       const ew = 0.018;
