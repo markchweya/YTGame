@@ -203,6 +203,9 @@ const UI = {
   updateStandings(game) {
     const rows = game.standings();
     const p = game.player;
+    const order = rows.map((r) => r.name).join('|');
+    const changed = this._standingsOrder && this._standingsOrder !== order;
+    this._standingsOrder = order;
     this.el['hud-standings'].innerHTML = rows
       .map((r, i) => {
         const gap = r.d - p.d;
@@ -210,6 +213,7 @@ const UI = {
         return this._standingRow(r, i, meta);
       })
       .join('');
+    if (changed) this.el['hud-standings'].querySelector('.standing.me')?.classList.add('flash');
   },
 
   /* Big centre banner for milestones, e.g. banner('SECTOR 1', '0:24.1') */
