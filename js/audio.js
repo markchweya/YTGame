@@ -200,6 +200,11 @@ class AudioEngine {
   bump() {
     this._noise({ dur: 0.2, vol: 0.25, cutoff: 600 });
   }
+  /* two-tone car horn from traffic you get close to */
+  horn() {
+    this._blip({ type: 'sawtooth', from: 392, to: 392, dur: 0.28, vol: 0.07 });
+    this._blip({ type: 'sawtooth', from: 494, to: 494, dur: 0.28, vol: 0.07 });
+  }
   /* metallic clang for the guardrail */
   rail() {
     this._noise({ dur: 0.25, vol: 0.35, cutoff: 2400 });
