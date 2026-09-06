@@ -90,6 +90,10 @@ class Obstacle {
     this.style = type === 'car' ? U.pick(Object.keys(CONFIG.CARS)) : null;
     this.seed = Math.random();
   }
+  /* light objects fly away when hit; heavy ones (barriers, vehicles) stay put */
+  get knockable() {
+    return this.type === 'cone' || this.type === 'rock';
+  }
 }
 
 const PICKUP_TYPES = {
