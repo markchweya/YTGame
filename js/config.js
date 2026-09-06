@@ -118,6 +118,8 @@ const CONFIG = {
 
   BIRDS: { count: 7, speed: 0.012, height: 0.42 },
 
+  SKIDS: { segment: 2.5, maxCount: 60, alpha: 0.55 },
+
   SETTINGS: {
     quality: 'high',
     fps: false,
