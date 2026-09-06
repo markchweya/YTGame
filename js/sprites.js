@@ -14,7 +14,7 @@ const Sprites = {
     const colors = new Set([...CONFIG.PALETTE.playerColors, ...CONFIG.RIVALS.colors, '#8d99ae', '#4a4e69', '#c9ada7', '#22577a', '#3d5a80', '#e07a5f', '#f1f1f1']);
     for (const c of colors) for (const s of Object.keys(CONFIG.CARS)) this.car(c, s);
     for (const c of ['#d9d9d9', '#b23a48', '#2f6f9f', '#f2b134']) this.truck(c);
-    for (const c of ['#ffd9a0', '#ff2040', '#ffd166', '#39c6ff', '#8ea6ff', '#5ee07a', '#ffcc33', '#ffffff']) this.glow(c, 96);
+    for (const c of ['#ffd9a0', '#ff2040', '#ffd166', '#39c6ff', '#8ea6ff', '#ffcc33', '#ffffff']) this.glow(c, 96);
   },
 
   car(color, style = 'sport', stripe = null) {
