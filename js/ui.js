@@ -14,7 +14,7 @@ const UI = {
       'hud-speed', 'speedo-fill', 'speedo-needle', 'speedo-ticks', 'hud-gear', 'hud-nitro', 'hud-coins', 'hud-shield', 'hud-combo',
       'race-progress', 'race-progress-wrap', 'best-race', 'best-endless', 'lb-body', 'lb-empty',
       'results-kicker', 'results-position', 'results-title', 'results-rank', 'results-standings',
-      'res-score', 'res-distance', 'res-time', 'res-topspeed', 'res-coins', 'res-overtakes', 'touch-controls', 'settings', 'hud-fps',
+      'res-score', 'res-distance', 'res-time', 'res-topspeed', 'res-coins', 'res-overtakes', 'touch-controls', 'settings', 'hud-fps', 'results-sectors',
     ];
     ids.forEach((id) => (this.el[id] = document.getElementById(id)));
     const path = this.el['speedo-fill'];
@@ -257,6 +257,12 @@ const UI = {
     }
     const rows = game.standings();
     e['results-standings'].innerHTML = rows.map((r, i) => this._standingRow(r, i, r.finish !== null ? U.fmtTime(r.finish) : `${U.fmtInt(r.d)} m`)).join('');
+    // sector splits (race mode); the final sector is whatever remains of the total time
+    const splits = game.player.sectorTimes.slice();
+    if (res.mode === 'race' && !dnf) splits.push(res.time - splits.reduce((a, b) => a + b, 0));
+    e['results-sectors'].classList.toggle('hidden', splits.length < 2);
+    const best = Math.min(...splits);
+    e['results-sectors'].innerHTML = splits.map((s, i) => `<div class="sector ${s === best ? 'best' : ''}"><span>S${i + 1}</span><b>${U.fmtTime(s)}</b></div>`).join('');
     this.show('results');
   },
 
