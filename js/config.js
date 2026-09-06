@@ -122,6 +122,21 @@ const CONFIG = {
 
   BIRDS: { count: 7, speed: 0.012, height: 0.42 },
 
+  /* WebGL renderer (js/renderer3d.js). Falls back to the 2D canvas renderer when unavailable. */
+  RENDER3D: {
+    enabled: true,
+    laneWidth: 3.5,         // metres per lane; road half-width = LANES * laneWidth / 2
+    fov: 60,
+    curveAmount: 140,       // metres of lateral offset at full curve at the far end of the view
+    hillAmount: 34,         // metres of rise at full hill at the far end of the view
+    roadSegments: 110,
+    roadBehind: 40,         // metres of road kept behind the camera
+    fogColor: '#e6ad86',
+    fogNear: 110,
+    fogFar: 330,
+    maxTrees: 60,
+  },
+
   SKIDS: { segment: 2.5, maxCount: 60, alpha: 0.55 },
 
   SETTINGS: {
