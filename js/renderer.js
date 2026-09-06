@@ -406,6 +406,17 @@ class Renderer {
       }
     }
 
+    // skid marks (two dark strips under the tyres)
+    for (const sk of game.skids || []) {
+      const a = this.project(sk.d, sk.x, game);
+      const b = this.project(sk.d + sk.length, sk.x, game);
+      if (!a || !b) continue;
+      ctx.fillStyle = `rgba(10,10,14,${sk.alpha * this.fogAlpha(a.z)})`;
+      for (const off of [-0.08, 0.08]) {
+        quad(ctx, a.cx + (sk.x + off - 0.03) * a.halfW, a.y, a.cx + (sk.x + off + 0.03) * a.halfW, b.cx + (sk.x + off - 0.03) * b.halfW, b.y, b.cx + (sk.x + off + 0.03) * b.halfW);
+      }
+    }
+
     // lamp light pools on the asphalt
     for (const lp of this.lampPositions(game)) {
       const p = this.project(lp.d, lp.side * 0.55, game);
