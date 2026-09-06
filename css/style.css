@@ -189,6 +189,12 @@ kbd { display: inline-block; min-width: 24px; text-align: center; padding: 3px 6
 .lb-table td:nth-child(3) { font-family: var(--display); font-size: 15px; font-weight: 700; color: var(--amber-2); font-variant-numeric: tabular-nums; }
 .lb-table td:last-child { color: var(--muted); font-size: 12px; }
 .lb-empty { padding: 28px; text-align: center; color: var(--muted); }
+.lb-tools { display: flex; gap: 18px; justify-content: center; margin-top: 14px; }
+
+/* full-width centre banner for milestones (sector times, records) */
+.banner { position: absolute; left: 0; right: 0; top: 40%; text-align: center; pointer-events: none; font-family: var(--display); font-weight: 900; font-size: clamp(28px, 5vw, 48px); letter-spacing: 0.08em; color: #fff; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 138, 31, 0.6); animation: banner 1.6s ease both; }
+.banner small { display: block; font-family: var(--label); font-size: 0.4em; letter-spacing: 0.3em; color: var(--amber-2); margin-top: 6px; }
+@keyframes banner { 0% { opacity: 0; transform: scale(0.85); } 15% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
 
 /* ---------- results ---------- */
 .results-panel { width: min(100%, 640px); text-align: center; }
