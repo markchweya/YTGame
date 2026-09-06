@@ -16,7 +16,6 @@ class Player {
     this.d = 0;
     this.speed = P.baseSpeed * 0.4;
     this.cruise = P.baseSpeed;
-    this.lives = P.lives;
     this.nitro = P.nitroStart;
     this.nitroActive = false;
     this.shield = false;
@@ -100,7 +99,6 @@ const PICKUP_TYPES = {
   coin: { halfWidth: 0.07, length: 1.5, weight: 7 },
   nitro: { halfWidth: 0.09, length: 1.8, weight: 3 },
   shield: { halfWidth: 0.09, length: 1.8, weight: 1.5 },
-  repair: { halfWidth: 0.09, length: 1.8, weight: 0.8 }, // restores one life (rare)
 };
 
 class Pickup {
