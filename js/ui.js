@@ -158,6 +158,13 @@ const UI = {
     this.el['hud-shield'].classList.toggle('hidden', !on);
   },
 
+  /* Surface colour cue: tints the speed readout while off the asphalt. */
+  updateSurface(level) {
+    const v = this.el['hud-speed'];
+    v.classList.toggle('shoulder', level === 1);
+    v.classList.toggle('grass', level === 2);
+  },
+
   combo(n) {
     const c = this.el['hud-combo'];
     if (n < 2) {
