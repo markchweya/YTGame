@@ -44,7 +44,8 @@ b { font-weight: 700; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 
 #app { position: fixed; inset: 0; }
-#game { position: absolute; inset: 0; display: block; }
+#game { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+#fx { position: absolute; inset: 0; pointer-events: none; }
 .hidden { display: none !important; }
 
 .eyebrow { font-family: var(--label); font-size: 12px; font-weight: 700; letter-spacing: 0.32em; color: var(--amber); }
@@ -143,8 +144,8 @@ b { font-weight: 700; }
 .btn-row .btn { flex: 1 1 auto; }
 .btn-col { display: grid; gap: 10px; }
 
-.menu-links { display: flex; gap: 22px; margin-top: 16px; }
-.link { background: none; border: 0; padding: 0; font-family: var(--label); font-weight: 700; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid transparent; }
+.menu-links { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 16px; }
+.link { background: none; border: 0; padding: 0; font-family: var(--label); font-weight: 700; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid transparent; white-space: nowrap; }
 .link:hover { color: var(--text); border-bottom-color: var(--amber); }
 
 /* garage */
