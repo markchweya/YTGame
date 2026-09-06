@@ -45,12 +45,13 @@ move between browsers until the online board lands.
 - **Competition** — five named rivals with their own body styles, speed bias, bursts,
   lane changes, obstacle avoidance and rubber-banding. Live standings, race progress
   chips, overtake bonuses.
-- **Modes** — Race (3 km sprint, position and time bonus) and Endless (survive and score).
+- **Modes** — Race (3 km sprint, position and time bonus) and Endless (two-minute time
+  attack, score as much as you can). There are no lives: a crash costs speed and points.
 - **Garage** — three body styles with different speed, handling and nitro; six paints;
   live turntable preview.
 - **Obstacles and pickups** — cones, barriers, rocks, oil, slow traffic; coins with
   combos, nitro canisters, a one-hit shield.
-- **HUD** — ticked speedometer with needle and gear, nitro segments, health bar,
+- **HUD** — ticked speedometer with needle and gear, nitro segments, crash counter,
   F1-style start lights, toasts, results with standings.
 - **Leaderboard** — top 10 per mode in local storage, behind a provider interface for
   the upcoming YouTube backend (see `docs/youtube-integration.md`).
