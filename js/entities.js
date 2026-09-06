@@ -47,9 +47,11 @@ class Rival {
     this.targetX = this.x;
     this.d = R.gridGap * (i + 1) + U.rand(-1, 1); // starting grid: rivals line up ahead, you chase them down
     this.speed = 0;
-    this.speedBias = U.rand(R.speedBias[0], R.speedBias[1]);
+    this.personality = U.pick(Object.keys(R.personalities || { steady: 1 }));
+    this.traits = (R.personalities && R.personalities[this.personality]) || { laneChange: R.laneChangeInterval, burstChance: 0.004, bias: 0 };
+    this.speedBias = U.rand(R.speedBias[0], R.speedBias[1]) + this.traits.bias;
     this.burst = 0;
-    this.laneTimer = U.rand(...R.laneChangeInterval);
+    this.laneTimer = U.rand(...this.traits.laneChange);
     this.wasAhead = true;
     this.halfWidth = R.carHalfWidth;
     this.length = R.carLength;
