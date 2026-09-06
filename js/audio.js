@@ -70,6 +70,34 @@ class AudioEngine {
     osc.stop(t + 0.6);
     osc2.stop(t + 0.6);
     this.engine = null;
+    this.setRumble(0);
+  }
+
+  /* Looping filtered noise for gravel/grass; level 0..1 */
+  setRumble(level) {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    if (!this.rumble && level > 0) {
+      const ctx = this.ctx;
+      const len = ctx.sampleRate * 1.5;
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+      const f = ctx.createBiquadFilter();
+      f.type = 'lowpass';
+      f.frequency.value = 260;
+      const g = ctx.createGain();
+      g.gain.value = 0;
+      src.connect(f);
+      f.connect(g);
+      g.connect(this.master);
+      src.start();
+      this.rumble = { src, g };
+    }
+    if (this.rumble) this.rumble.g.gain.setTargetAtTime(0.35 * level, t, 0.08);
   }
 
   /* speed01: 0..1 normalised, nitro: bool */
