@@ -32,8 +32,7 @@ const CONFIG = {
     steerSmoothing: 10,
     carHalfWidth: 0.15,
     carLength: 4.6,
-    lives: 3,
-    invulnTime: 1.6,
+    invulnTime: 1.6,        // seconds of immunity after a crash (no lives — crashes only cost speed and points)
     crashSpeedMult: 0.35,
     nitroMult: 1.5,
     nitroDrain: 0.28,
@@ -92,6 +91,10 @@ const CONFIG = {
     carLength: 4.6,
     carHalfWidth: 0.15,
     bumpSpeedMult: 0.7,
+  },
+
+  ENDLESS: {
+    duration: 120,          // seconds — endless is a time attack: score as much as you can
   },
 
   RACE: {
