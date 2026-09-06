@@ -120,6 +120,15 @@ const CONFIG = {
     quality: 'high',
     fps: false,
     shake: true,
+    volume: 0.6,
+    difficulty: 'normal',
+  },
+
+  /* Difficulty presets: multiply spawn gaps (lower = denser) and shift rival speed bias. */
+  DIFFICULTY_LEVELS: {
+    easy: { spawnGap: 1.35, rivalBias: -0.05, label: 'Easy' },
+    normal: { spawnGap: 1.0, rivalBias: 0, label: 'Normal' },
+    hard: { spawnGap: 0.75, rivalBias: 0.04, label: 'Hard' },
   },
 
   YOUTUBE: {
