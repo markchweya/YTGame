@@ -62,6 +62,7 @@ const CONFIG = {
     puddleSpeedMult: 0.9,   // speed kept after hitting a puddle
     truckChance: 0.25,      // share of traffic spawns that are trucks
     truckSpeedRange: [0.42, 0.55], // fraction of the player's cruise speed
+    hornChance: 0.5,        // chance a traffic car honks when you brush past it
   },
 
   DIFFICULTY: {
