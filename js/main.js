@@ -290,6 +290,13 @@
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && game.state === 'playing') game.pause();
   });
+  // don't lose a race to an accidental refresh or back-swipe
+  window.addEventListener('beforeunload', (e) => {
+    if (game.state === 'playing' || game.state === 'paused') {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
 
   /* ---- results ---- */
   game.onFinished = async (res) => {
