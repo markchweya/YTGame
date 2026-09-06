@@ -110,6 +110,12 @@ const CONFIG = {
     edge: 'rgba(250,250,245,0.95)',
   },
 
+  SETTINGS: {
+    quality: 'high',
+    fps: false,
+    shake: true,
+  },
+
   YOUTUBE: {
     enabled: false,
     apiBase: '',
