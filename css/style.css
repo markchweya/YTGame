@@ -155,6 +155,9 @@ b { font-weight: 700; }
 .showcase canvas { width: 100%; height: 100%; display: block; }
 .style-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .style-tab { padding: 9px 6px; border: 1px solid var(--line); background: var(--panel-2); font-family: var(--label); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); clip-path: var(--chamfer-sm); }
+.style-tab { transition: background 0.15s, color 0.15s, transform 0.12s; }
+.style-tab:hover { background: rgba(255, 255, 255, 0.08); color: var(--text); }
+.style-tab:active, .mode-card:active { transform: scale(0.98); }
 .style-tab.active { color: var(--text); border-color: var(--teal); background: rgba(33, 199, 214, 0.12); }
 .stat-bars { display: grid; gap: 6px; }
 .stat-bar { display: grid; grid-template-columns: 82px 1fr; align-items: center; gap: 10px; font-family: var(--label); font-size: 12px; font-weight: 700; letter-spacing: 0.16em; color: var(--muted); }
