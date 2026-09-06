@@ -184,6 +184,10 @@ kbd { display: inline-block; min-width: 24px; text-align: center; padding: 3px 6
 .setting input[type='checkbox']::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: var(--muted); transition: transform 0.15s, background 0.15s; }
 .setting input[type='checkbox']:checked { background: rgba(33, 199, 214, 0.35); }
 .setting input[type='checkbox']:checked::after { transform: translateX(18px); background: var(--teal); }
+.setting input[type='range'] { width: 150px; accent-color: var(--amber); }
+.results-rank .pb { display: inline-block; margin-left: 8px; padding: 2px 8px; font-family: var(--label); font-weight: 700; font-size: 12px; letter-spacing: 0.1em; clip-path: var(--chamfer-sm); }
+.results-rank .pb.up { background: rgba(94, 224, 122, 0.18); color: var(--good); }
+.results-rank .pb.down { background: rgba(255, 255, 255, 0.08); color: var(--muted); }
 .fps { position: absolute; right: 16px; top: calc(96px + var(--safe-top)); font-family: var(--display); font-size: 12px; color: var(--muted); background: rgba(10, 12, 18, 0.6); padding: 4px 8px; border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
 
 /* ---------- leaderboard ---------- */
