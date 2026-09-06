@@ -236,7 +236,7 @@ const UI = {
     setTimeout(() => t.remove(), 2100);
   },
 
-  showResults(game, res, rankInfo) {
+  showResults(game, res, rankInfo, prevBest = null) {
     if (game.state !== 'finished') return; // player already restarted or quit while results were pending
     const e = this.el;
     const dnf = res.wrecked && res.mode === 'race';
@@ -254,6 +254,13 @@ const UI = {
       e['results-rank'].innerHTML = rankInfo.rank === 1 ? `🏆 <b>New #1 on the ${res.mode} board</b>` : `Ranked <b>#${rankInfo.rank}</b> on the ${res.mode} board`;
     } else {
       e['results-rank'].textContent = 'Outside the top 10 — push harder.';
+    }
+    if (prevBest && typeof prevBest.score === 'number') {
+      const delta = res.score - prevBest.score;
+      const pb = document.createElement('span');
+      pb.className = 'pb ' + (delta > 0 ? 'up' : 'down');
+      pb.textContent = delta > 0 ? `NEW PB +${U.fmtInt(delta)}` : `PB ${U.fmtInt(prevBest.score)}`;
+      e['results-rank'].appendChild(pb);
     }
     const rows = game.standings();
     e['results-standings'].innerHTML = rows.map((r, i) => this._standingRow(r, i, r.finish !== null ? U.fmtTime(r.finish) : `${U.fmtInt(r.d)} m`)).join('');
