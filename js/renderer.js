@@ -142,7 +142,12 @@ class Renderer {
   /* ---------- frame ---------- */
   render(game) {
     const ctx = this.ctx;
+    // camera pitch: the horizon drops slightly as speed climbs, which reads as the nose lifting
+    const speedFrac = U.clamp(game.player.speed / (CONFIG.PLAYER.maxSpeed * CONFIG.PLAYER.nitroMult), 0, 1);
+    const targetPitch = -speedFrac * this.H * 0.018;
+    this.pitch = this.pitch === undefined ? targetPitch : this.pitch + (targetPitch - this.pitch) * 0.08;
     ctx.save();
+    ctx.translate(0, this.pitch);
     if (game.shake > 0.01) ctx.translate(U.rand(-1, 1) * game.shake * 12, U.rand(-1, 1) * game.shake * 9);
     this.drawSky(game);
     this.drawGround(game);
@@ -283,7 +288,7 @@ class Renderer {
     const tex = this.tex;
 
     ctx.fillStyle = '#243a1e';
-    ctx.fillRect(0, horizonY, W, H - horizonY);
+    ctx.fillRect(0, horizonY, W, H - horizonY + 40);
 
     // far -> near so uphill slices overlap correctly
     for (let i = N - 1; i >= 0; i--) {
