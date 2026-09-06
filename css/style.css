@@ -220,6 +220,11 @@ kbd { display: inline-block; min-width: 24px; text-align: center; padding: 3px 6
 .results-rank { margin: 6px 0 14px; font-size: 14px; color: var(--muted); }
 .results-rank b { color: var(--gold); }
 .results-standings { margin-bottom: 18px; text-align: left; }
+.sectors { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+.sector { display: grid; gap: 2px; padding: 6px 12px; background: var(--panel-2); border: 1px solid var(--line); clip-path: var(--chamfer-sm); }
+.sector span { font-family: var(--label); font-size: 10px; letter-spacing: 0.22em; color: var(--muted); font-weight: 700; }
+.sector b { font-family: var(--display); font-size: 14px; font-variant-numeric: tabular-nums; }
+.sector.best b { color: var(--good); }
 
 /* ---------- HUD ---------- */
 .hud { pointer-events: none; padding: calc(12px + var(--safe-top)) 14px calc(12px + var(--safe-bottom)); display: flex; flex-direction: column; justify-content: space-between; }
