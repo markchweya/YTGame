@@ -89,6 +89,7 @@
         <button class="touch-btn steer" id="touch-right" aria-label="Steer right">▶</button>
       </div>
       <button class="pause-btn" id="btn-pause" aria-label="Pause"><span></span><span></span></button>
+      <div class="fps hidden" id="hud-fps">60 FPS</div>
     </section>
 
     <!-- start lights -->
@@ -134,6 +135,7 @@
           <div class="menu-links">
             <button class="link" id="btn-leaderboard">Leaderboard</button>
             <button class="link" id="btn-howto">How to play</button>
+            <button class="link" id="btn-settings">Settings</button>
             <button class="link" id="btn-sound" aria-label="Toggle sound">Sound on</button>
           </div>
         </div>
@@ -199,6 +201,36 @@
           <button class="link" id="btn-lb-import">Import JSON</button>
           <input type="file" id="lb-file" accept="application/json,.json" hidden />
         </div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section id="settings" class="screen overlay hidden">
+      <div class="panel small-panel">
+        <div class="eyebrow">OPTIONS</div>
+        <h2>Settings</h2>
+        <div class="settings-list">
+          <label class="setting">
+            <span>Graphics quality</span>
+            <select id="set-quality">
+              <option value="high">High</option>
+              <option value="low">Low (older devices)</option>
+            </select>
+          </label>
+          <label class="setting">
+            <span>Show FPS counter</span>
+            <input type="checkbox" id="set-fps" />
+          </label>
+          <label class="setting">
+            <span>Screen shake</span>
+            <input type="checkbox" id="set-shake" checked />
+          </label>
+          <label class="setting">
+            <span>Sound</span>
+            <input type="checkbox" id="set-sound" checked />
+          </label>
+        </div>
+        <button class="btn primary" id="btn-settings-back">Done</button>
       </div>
     </section>
 
