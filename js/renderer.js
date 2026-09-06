@@ -536,7 +536,7 @@ class Renderer {
           this.drawPickup(it.e, it.p, game.time);
           break;
         case 'rival':
-          this.drawCar(it.p, it.e.color, it.e.style, { tilt: (it.e.targetX - it.e.x) * 0.4, label: it.e.name });
+          this.drawCar(it.p, it.e.color, it.e.style, { tilt: (it.e.targetX - it.e.x) * 0.4, label: it.e.name, brake: it.e.braking, stripe: it.e.stripe });
           break;
         case 'player': {
           const blink = pl.invuln > 0 && Math.floor(game.time * 14) % 2 === 0;
@@ -551,7 +551,7 @@ class Renderer {
 
   drawCar(p, color, style, o) {
     const ctx = this.ctx;
-    const sprite = Sprites.car(color, style);
+    const sprite = Sprites.car(color, style, o.stripe);
     const w = this.laneW * 0.66 * p.s;
     const h = w * (Sprites.CAR_H / Sprites.CAR_W);
     const groundFrac = Sprites.GROUND / Sprites.CAR_H;
