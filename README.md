@@ -90,4 +90,12 @@ fails on any page error. The same test runs in GitHub Actions on every push.
 
 ## Tuning
 
-Everything gameplay-related is in `js/config.js`.
+Everything gameplay-related is in `js/config.js`; `docs/tuning.md` maps the knobs.
+
+## Roadmap
+
+- YouTube live-chat rivals and a shared online leaderboard (`docs/youtube-integration.md`).
+- Time-of-day cycle (day, dusk, night with headlights doing real work).
+- Weather: rain with wet-road reflections and reduced grip.
+- More body kits and liveries in the garage.
+- Ghost replay of your personal best.
