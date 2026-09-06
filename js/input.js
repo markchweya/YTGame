@@ -7,6 +7,7 @@ class Input {
     this.touch = { left: false, right: false, brake: false, nitro: false };
     this.onPause = null;
     this.onMute = null;
+    this.onRestart = null; // 'r' key
     this.onAny = null; // any first interaction (used to unlock audio)
 
     window.addEventListener('keydown', (e) => {
@@ -16,6 +17,7 @@ class Input {
       if (!this.keys.has(k)) {
         if ((k === 'p' || k === 'escape') && this.onPause) this.onPause();
         if (k === 'm' && this.onMute) this.onMute();
+        if (k === 'r' && this.onRestart) this.onRestart();
       }
       this.keys.add(k);
       this.onAny && this.onAny();
