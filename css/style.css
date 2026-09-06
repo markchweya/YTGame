@@ -176,6 +176,16 @@ kbd { display: inline-block; min-width: 24px; text-align: center; padding: 3px 6
 .dot { width: 10px; height: 10px; display: inline-block; flex: none; }
 .dot.cone { background: #ff7b00; } .dot.oil { background: #2b2b33; border: 1px solid #666; } .dot.rail { background: #a7adb8; } .dot.coin { background: var(--gold); } .dot.nitro { background: var(--teal); } .dot.shield { background: #8ea6ff; }
 
+/* ---------- settings ---------- */
+.settings-list { display: grid; gap: 8px; margin-bottom: 18px; }
+.setting { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; background: var(--panel-2); border: 1px solid var(--line); clip-path: var(--chamfer-sm); font-size: 14px; cursor: pointer; }
+.setting select { background: rgba(0, 0, 0, 0.35); color: var(--text); border: 1px solid var(--line); padding: 6px 10px; font-family: var(--label); font-weight: 700; letter-spacing: 0.06em; }
+.setting input[type='checkbox'] { width: 40px; height: 22px; appearance: none; -webkit-appearance: none; background: rgba(255, 255, 255, 0.12); position: relative; cursor: pointer; clip-path: var(--chamfer-sm); }
+.setting input[type='checkbox']::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: var(--muted); transition: transform 0.15s, background 0.15s; }
+.setting input[type='checkbox']:checked { background: rgba(33, 199, 214, 0.35); }
+.setting input[type='checkbox']:checked::after { transform: translateX(18px); background: var(--teal); }
+.fps { position: absolute; right: 16px; top: calc(96px + var(--safe-top)); font-family: var(--display); font-size: 12px; color: var(--muted); background: rgba(10, 12, 18, 0.6); padding: 4px 8px; border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+
 /* ---------- leaderboard ---------- */
 .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
 .tab { flex: 1; padding: 9px; border: 1px solid var(--line); background: var(--panel-2); font-family: var(--label); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); clip-path: var(--chamfer-sm); }
