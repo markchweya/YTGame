@@ -32,6 +32,13 @@ function serve() {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto(url);
+  // settings panel opens, toggles quality, and closes cleanly
+  await page.click('#btn-settings');
+  await page.waitForSelector('#settings:not(.hidden)');
+  await page.selectOption('#set-quality', 'low');
+  await page.selectOption('#set-quality', 'high');
+  await page.click('#btn-settings-back');
+  await page.waitForSelector('#menu:not(.hidden)');
   await page.evaluate(() => (window.NeonRush.CONFIG.RACE.length = 500));
   await page.fill('#input-name', 'Bot');
   await page.click('#btn-play');
