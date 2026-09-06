@@ -512,6 +512,7 @@ class Renderer {
           break;
         case 'obstacle':
           if (it.e.type === 'car') this.drawCar(it.p, it.e.color, it.e.style || 'sport', {});
+          else if (it.e.type === 'truck') this.drawTruck(it.p, it.e.color);
           else this.drawObstacle(it.e, it.p, game.time);
           break;
         case 'pickup':
@@ -596,6 +597,13 @@ class Renderer {
       ctx.fillRect(-tw / 2 - 3 * k, ly - 8 * k, 3 * k, 16 * k);
     }
     ctx.restore();
+  }
+
+  drawTruck(p, color) {
+    const sprite = Sprites.truck(color);
+    const w = this.laneW * 0.8 * p.s;
+    const h = w * (Sprites.TRUCK_H / Sprites.TRUCK_W);
+    this.ctx.drawImage(sprite, p.x - w / 2, p.y - h * (Sprites.TRUCK_GROUND / Sprites.TRUCK_H), w, h);
   }
 
   drawProp(pr, p, game) {
@@ -894,6 +902,24 @@ class Renderer {
         ctx.lineTo(w / 2, -h * 0.3);
         ctx.lineTo(w * 0.4, 0);
         ctx.closePath();
+        ctx.fill();
+        break;
+      }
+      case 'puddle': {
+        const rx = lw * 0.46;
+        const ry = rx * 0.28;
+        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+        g.addColorStop(0, 'rgba(120,150,190,0.55)');
+        g.addColorStop(0.7, 'rgba(70,95,130,0.45)');
+        g.addColorStop(1, 'rgba(60,80,110,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, 6.283);
+        ctx.fill();
+        // sky reflection streak
+        ctx.fillStyle = 'rgba(255,220,180,0.25)';
+        ctx.beginPath();
+        ctx.ellipse(rx * 0.15, -ry * 0.15, rx * 0.35, ry * 0.25, 0, 0, 6.283);
         ctx.fill();
         break;
       }
