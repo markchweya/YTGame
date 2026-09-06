@@ -11,6 +11,8 @@
   }
 
   const game = new Game({ canvas, input, audio, ui: UI });
+  // rasterise car/truck/glow sprites while the menu is up instead of mid-race
+  (window.requestIdleCallback || ((fn) => setTimeout(fn, 200)))(() => Sprites.preload());
 
   /* ---- persisted settings ---- */
   let mode = Storage.get('mode', 'race');
