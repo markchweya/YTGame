@@ -178,6 +178,26 @@
   });
   $('btn-howto-back').addEventListener('click', () => UI.show('menu'));
 
+  /* ---- settings ---- */
+  const settings = Object.assign({}, CONFIG.SETTINGS, Storage.get('settings', {}));
+  const applySettings = () => {
+    game.renderer.quality = settings.quality;
+    game.shakeEnabled = settings.shake;
+    UI.showFps(settings.fps);
+    $('set-quality').value = settings.quality;
+    $('set-fps').checked = settings.fps;
+    $('set-shake').checked = settings.shake;
+    $('set-sound').checked = !audio.muted;
+    Storage.set('settings', settings);
+  };
+  $('set-quality').addEventListener('change', (e) => { settings.quality = e.target.value; applySettings(); });
+  $('set-fps').addEventListener('change', (e) => { settings.fps = e.target.checked; applySettings(); });
+  $('set-shake').addEventListener('change', (e) => { settings.shake = e.target.checked; applySettings(); });
+  $('set-sound').addEventListener('change', (e) => { audio.unlock(); audio.setMuted(!e.target.checked); syncSound(); });
+  $('btn-settings').addEventListener('click', () => { applySettings(); UI.show('settings'); audio.click(); });
+  $('btn-settings-back').addEventListener('click', () => UI.show('menu'));
+  applySettings();
+
   let lbMode = mode;
   let lbReturn = 'menu';
   $('btn-leaderboard').addEventListener('click', () => {
