@@ -1,6 +1,6 @@
 {
   "name": "neon-rush",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Arcade highway racer with AI rivals, obstacles and a leaderboard. Zero build step.",
   "private": true,
   "scripts": {
